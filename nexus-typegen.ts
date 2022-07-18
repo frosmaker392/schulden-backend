@@ -4,7 +4,7 @@
  */
 
 
-
+import type { Context } from "./src/context"
 
 
 
@@ -31,8 +31,7 @@ export interface NexusGenObjects {
   Query: {};
   User: { // root type
     email: string; // String!
-    id: number; // Int!
-    passHash: string; // String!
+    id: string; // String!
     username: string; // String!
   }
 }
@@ -53,8 +52,7 @@ export interface NexusGenFieldTypes {
   }
   User: { // field return type
     email: string; // String!
-    id: number; // Int!
-    passHash: string; // String!
+    id: string; // String!
     username: string; // String!
   }
 }
@@ -65,8 +63,7 @@ export interface NexusGenFieldTypeNames {
   }
   User: { // field return type name
     email: 'String'
-    id: 'Int'
-    passHash: 'String'
+    id: 'String'
     username: 'String'
   }
 }
@@ -105,7 +102,7 @@ export type NexusGenFeaturesConfig = {
 }
 
 export interface NexusGenTypes {
-  context: any;
+  context: Context;
   inputTypes: NexusGenInputs;
   rootTypes: NexusGenRootTypes;
   inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;

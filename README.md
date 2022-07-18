@@ -12,3 +12,7 @@ docker run \
     neo4j:4.4.8
 ```
 2. Run `npm run dev` for the development server.
+
+## Commands
+
+- `generate` - Generates GraphQL and TypeScript type definitions from nexus schema (under src/graphql).

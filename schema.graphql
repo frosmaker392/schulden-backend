@@ -8,7 +8,6 @@ type Query {
 
 type User {
   email: String!
-  id: Int!
-  passHash: String!
+  id: String!
   username: String!
 }
