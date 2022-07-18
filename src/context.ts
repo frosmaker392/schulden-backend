@@ -1,4 +1,4 @@
-import { UserDao, UserMemoryDao } from "./daos/UserDao";
+import { UserDao, UserMemoryDao } from './daos/UserDao'
 
 export const userDao = new UserMemoryDao()
 

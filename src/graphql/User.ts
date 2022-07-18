@@ -1,5 +1,4 @@
 import { extendType, objectType } from 'nexus'
-import { NexusGenObjects } from '../../nexus-typegen'
 
 export const User = objectType({
   name: "User",
@@ -15,8 +14,8 @@ export const UserQuery = extendType({
   definition(t) {
     t.nonNull.list.nonNull.field("users", {
       type: "User",
-      resolve(parent, args, context, info) {
-        return context.userDao.getAll()
+      async resolve(parent, args, context, info) {
+        return await context.userDao.getAll()
       }
     })
   }
