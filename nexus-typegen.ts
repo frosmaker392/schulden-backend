@@ -28,7 +28,10 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
-  AuthPayload: { // root type
+  AuthFailure: { // root type
+    reason: string; // String!
+  }
+  AuthSuccess: { // root type
     token: string; // String!
     user: NexusGenRootTypes['User']; // User!
   }
@@ -45,14 +48,18 @@ export interface NexusGenInterfaces {
 }
 
 export interface NexusGenUnions {
+  AuthPayload: NexusGenRootTypes['AuthFailure'] | NexusGenRootTypes['AuthSuccess'];
 }
 
-export type NexusGenRootTypes = NexusGenObjects
+export type NexusGenRootTypes = NexusGenObjects & NexusGenUnions
 
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
-  AuthPayload: { // field return type
+  AuthFailure: { // field return type
+    reason: string; // String!
+  }
+  AuthSuccess: { // field return type
     token: string; // String!
     user: NexusGenRootTypes['User']; // User!
   }
@@ -71,7 +78,10 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenFieldTypeNames {
-  AuthPayload: { // field return type name
+  AuthFailure: { // field return type name
+    reason: 'String'
+  }
+  AuthSuccess: { // field return type name
     token: 'String'
     user: 'User'
   }
@@ -104,6 +114,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractTypeMembers {
+  AuthPayload: "AuthFailure" | "AuthSuccess"
 }
 
 export interface NexusGenTypeInterfaces {
@@ -119,11 +130,11 @@ export type NexusGenInterfaceNames = never;
 
 export type NexusGenScalarNames = keyof NexusGenScalars;
 
-export type NexusGenUnionNames = never;
+export type NexusGenUnionNames = keyof NexusGenUnions;
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
-export type NexusGenAbstractsUsingStrategyResolveType = never;
+export type NexusGenAbstractsUsingStrategyResolveType = "AuthPayload";
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

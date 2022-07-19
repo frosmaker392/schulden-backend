@@ -14,8 +14,8 @@ export const UserQuery = extendType({
   definition(t) {
     t.nonNull.list.nonNull.field('users', {
       type: 'User',
-      async resolve(parent, args, context) {
-        return await context.userDao.getAll()
+      resolve() {
+        return []
       }
     })
   }

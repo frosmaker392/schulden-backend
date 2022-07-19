@@ -6,19 +6,19 @@ const testUsers: User[] = [
     id: 'test-id-1',
     email: 'userA@test.com',
     username: 'userA',
-    passHash: 'userA-hash'
+    passwordHash: 'userA-hash'
   },
   {
     id: 'test-id-2',
     email: 'userB@test.com',
     username: 'userB',
-    passHash: 'userB-hash'
+    passwordHash: 'userB-hash'
   },
   {
     id: 'test-id-3',
     email: 'userC@test.com',
     username: 'userC',
-    passHash: 'userC-hash'
+    passwordHash: 'userC-hash'
   }
 ]
 
@@ -35,7 +35,7 @@ describe('UserMemoryDao', () => {
     expect(user.id).not.toBe(testUsers[0].id)
     expect(user.email).toBe(testUsers[0].email)
     expect(user.username).toBe(testUsers[0].username)
-    expect(user.passHash).toBe(testUsers[0].passHash)
+    expect(user.passwordHash).toBe(testUsers[0].passwordHash)
   })
 
   describe('getAll', () => {

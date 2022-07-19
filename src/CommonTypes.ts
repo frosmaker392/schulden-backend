@@ -12,4 +12,6 @@ export type Optional<T> = T | undefined
 export type PartialExceptId<T> = WithId & Partial<Omit<T, 'id'>>
 
 // Types derived from NexusGenObjects
-export type User = NexusGenObjects['User'] & { passHash: string }
+export type User = NexusGenObjects['User'] & {
+  passwordHash: string
+}

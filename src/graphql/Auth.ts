@@ -1,14 +1,31 @@
-import { extendType, nonNull, objectType, stringArg } from 'nexus'
-import * as bcrypt from 'bcryptjs'
-import * as jwt from 'jsonwebtoken'
+import { extendType, nonNull, objectType, stringArg, unionType } from 'nexus'
 
-export const AuthPayload = objectType({
-  name: 'AuthPayload',
+export const AuthSuccess = objectType({
+  name: 'AuthSuccess',
   definition(t) {
     t.nonNull.string('token')
     t.nonNull.field('user', {
       type: 'User'
     })
+  }
+})
+
+export const AuthFailure = objectType({
+  name: 'AuthFailure',
+  definition(t) {
+    t.nonNull.string('reason')
+  }
+})
+
+export const AuthPayload = unionType({
+  name: 'AuthPayload',
+  resolveType(data) {
+    const __typename = 'token' in data ? 'AuthSuccess' : 'AuthFailure'
+
+    return __typename
+  },
+  definition(t) {
+    t.members('AuthSuccess', 'AuthFailure')
   }
 })
 
@@ -22,21 +39,7 @@ export const AuthMutation = extendType({
         password: nonNull(stringArg())
       },
       async resolve(parent, args, context) {
-        const user = await context.userDao.getByEmail(args.email)
-        if (!user) throw new Error('Invalid email and password combination.')
-
-        const valid = await bcrypt.compare(args.password, user.passHash)
-        if (!valid) throw new Error('Invalid email and password combination.')
-
-        const token = jwt.sign(
-          { userId: user.id },
-          process.env.APP_SECRET ?? 'default-secret'
-        )
-
-        return {
-          token,
-          user
-        }
+        return context.authService.login(args)
       }
     })
 
@@ -48,24 +51,7 @@ export const AuthMutation = extendType({
         password: nonNull(stringArg())
       },
       async resolve(parent, args, context) {
-        const { username, email } = args
-        const passHash = await bcrypt.hash(args.password, 10)
-
-        const user = await context.userDao.create({
-          email,
-          username,
-          passHash
-        })
-
-        const token = jwt.sign(
-          { userId: user.id },
-          process.env.APP_SECRET ?? 'default-secret'
-        )
-
-        return {
-          token,
-          user
-        }
+        return context.authService.register(args)
       }
     })
   }

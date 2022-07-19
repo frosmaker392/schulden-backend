@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 
-import { UserDao, UserMemoryDao } from './daos/UserDao'
+import { UserMemoryDao } from './daos/UserDao'
+import AuthService from './services/AuthService'
 import EnvExtractor, { EnvObject } from './utils/EnvExtractor'
 
 const envKeys = ['PORT', 'APP_SECRET'] as const
@@ -10,11 +11,12 @@ const envDefaults: EnvObject<typeof envKeys> = {
   APP_SECRET: 'secret'
 }
 
-interface Context {
-  userDao: UserDao
+export interface Context {
+  authService: AuthService
   envObject: EnvObject<typeof envKeys>
 }
 
+// Initialize environment variables
 dotenv.config()
 
 const envExtractor = new EnvExtractor(envKeys, envDefaults)
@@ -27,9 +29,11 @@ const { envObject, warnings } = envExtractor.getEnvVariables(
 // Print all warnings for missing env values
 warnings.map(console.warn)
 
+// Initialize services
 const userDao = new UserMemoryDao()
+const authService = new AuthService(userDao, envObject.APP_SECRET)
 
 export const context: Context = {
-  userDao,
+  authService,
   envObject
 }

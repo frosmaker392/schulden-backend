@@ -2,7 +2,13 @@
 ### Do not make changes to this file directly
 
 
-type AuthPayload {
+type AuthFailure {
+  reason: String!
+}
+
+union AuthPayload = AuthFailure | AuthSuccess
+
+type AuthSuccess {
   token: String!
   user: User!
 }
