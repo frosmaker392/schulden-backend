@@ -11,7 +11,8 @@ docker run \
     --volume=$HOME/neo4j/data:/data \
     neo4j:4.4.8
 ```
-2. Run `npm run dev` for the development server.
+2. Run `npm install` to install all dependencies.
+3. Run `npm run dev` for the development server.
 
 ## Commands
 
