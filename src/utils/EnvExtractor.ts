@@ -7,17 +7,14 @@ interface EnvExtractionResult<T extends EnvKeys> {
 }
 
 export default class EnvExtractor<T extends EnvKeys> {
-  constructor(
-    private envKeys: T,
-    private defaults: EnvObject<T>,
-  ) {}
+  constructor(private envKeys: T, private defaults: EnvObject<T>) {}
 
   getEnvVariables(
-    processEnv: NodeJS.ProcessEnv, 
+    processEnv: NodeJS.ProcessEnv,
     warningGenerator: (envKey: T[number], defaultValue: string) => string
   ): EnvExtractionResult<T> {
     const envObject: EnvObject<T> = this.envKeys.reduce((acc, key) => {
-      acc[key as T[number]] = ""
+      acc[key as T[number]] = ''
       return acc
     }, {} as EnvObject<T>)
 
@@ -29,16 +26,13 @@ export default class EnvExtractor<T extends EnvKeys> {
 
       envObject[envKey as T[number]] = value ?? defaultValue
 
-      value ?? 
-        warnings.push(
-          warningGenerator(envKey, defaultValue)
-        )
+      value ?? warnings.push(warningGenerator(envKey, defaultValue))
     }
 
     Object.freeze(envObject)
 
     return {
-      envObject, 
+      envObject,
       warnings
     }
   }

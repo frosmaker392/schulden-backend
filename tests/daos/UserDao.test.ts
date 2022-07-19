@@ -3,23 +3,23 @@ import { UserMemoryDao } from '../../src/daos/UserDao'
 
 const testUsers: User[] = [
   {
-    id: "test-id-1",
-    email: "userA@test.com",
-    username: "userA",
-    passHash: "userA-hash"
+    id: 'test-id-1',
+    email: 'userA@test.com',
+    username: 'userA',
+    passHash: 'userA-hash'
   },
   {
-    id: "test-id-2",
-    email: "userB@test.com",
-    username: "userB",
-    passHash: "userB-hash"
+    id: 'test-id-2',
+    email: 'userB@test.com',
+    username: 'userB',
+    passHash: 'userB-hash'
   },
   {
-    id: "test-id-3",
-    email: "userC@test.com",
-    username: "userC",
-    passHash: "userC-hash"
-  },
+    id: 'test-id-3',
+    email: 'userC@test.com',
+    username: 'userC',
+    passHash: 'userC-hash'
+  }
 ]
 
 let userDao: UserMemoryDao
@@ -44,8 +44,7 @@ describe('UserMemoryDao', () => {
     })
 
     test('returns correct list of all users', async () => {
-      for (const testUser of testUsers)
-        await userDao.create(testUser)
+      for (const testUser of testUsers) await userDao.create(testUser)
 
       const users = await userDao.getAll()
 
@@ -59,7 +58,9 @@ describe('UserMemoryDao', () => {
   let createdUsers: User[]
   describe('getById', () => {
     beforeEach(async () => {
-      createdUsers = await Promise.all(testUsers.map(async testUser => await userDao.create(testUser)))
+      createdUsers = await Promise.all(
+        testUsers.map(async (testUser) => await userDao.create(testUser))
+      )
     })
 
     test('returns correct user associated with id', async () => {
@@ -69,8 +70,7 @@ describe('UserMemoryDao', () => {
     })
 
     test('returns undefined if no user is found', async () => {
-      for (const testUser of testUsers)
-        userDao.create(testUser)
+      for (const testUser of testUsers) userDao.create(testUser)
 
       const user = await userDao.getById('non-existent-id')
 
@@ -80,7 +80,9 @@ describe('UserMemoryDao', () => {
 
   describe('getByEmail', () => {
     beforeEach(async () => {
-      createdUsers = await Promise.all(testUsers.map(async testUser => await userDao.create(testUser)))
+      createdUsers = await Promise.all(
+        testUsers.map(async (testUser) => await userDao.create(testUser))
+      )
     })
 
     test('returns correct user associated with email', async () => {
@@ -90,8 +92,7 @@ describe('UserMemoryDao', () => {
     })
 
     test('returns undefined if no user is found', async () => {
-      for (const testUser of testUsers)
-        userDao.create(testUser)
+      for (const testUser of testUsers) userDao.create(testUser)
 
       const user = await userDao.getByEmail('non-existent-email')
 
@@ -101,25 +102,27 @@ describe('UserMemoryDao', () => {
 
   describe('update', () => {
     beforeEach(async () => {
-      createdUsers = await Promise.all(testUsers.map(async testUser => await userDao.create(testUser)))
+      createdUsers = await Promise.all(
+        testUsers.map(async (testUser) => await userDao.create(testUser))
+      )
     })
 
     test('returns updated user', async () => {
       const updatedUser = await userDao.update({
         id: createdUsers[0].id,
-        username: "updatedUserA"
+        username: 'updatedUserA'
       })
 
-      expect(updatedUser?.username).toBe("updatedUserA")
-      expect((await userDao.getById(
-          createdUsers[0].id
-        ))?.username).toBe('updatedUserA')
+      expect(updatedUser?.username).toBe('updatedUserA')
+      expect((await userDao.getById(createdUsers[0].id))?.username).toBe(
+        'updatedUserA'
+      )
     })
 
     test('returns undefined if no user is found', async () => {
       const updatedUser = await userDao.update({
-        id: "non-existent-id",
-        username: "updatedUsername"
+        id: 'non-existent-id',
+        username: 'updatedUsername'
       })
 
       expect(updatedUser).toBeUndefined()
@@ -128,7 +131,9 @@ describe('UserMemoryDao', () => {
 
   describe('deleteById', () => {
     beforeEach(async () => {
-      createdUsers = await Promise.all(testUsers.map(async testUser => await userDao.create(testUser)))
+      createdUsers = await Promise.all(
+        testUsers.map(async (testUser) => await userDao.create(testUser))
+      )
     })
 
     test('returns deleted user', async () => {

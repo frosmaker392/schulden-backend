@@ -4,10 +4,9 @@ import { schema } from './schema'
 
 export const server = new ApolloServer({
   schema,
-  context,
+  context
 })
 
-server.listen({ port: parseInt(context.envObject.PORT) })
-  .then(({ url }) => {
-    console.log(`Server ready at ${url}`)
-  })
+server.listen({ port: parseInt(context.envObject.PORT) }).then(({ url }) => {
+  console.log(`Server ready at ${url}`)
+})
