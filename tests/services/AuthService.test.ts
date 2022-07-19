@@ -58,7 +58,18 @@ describe('AuthService', () => {
     test('failure if email is already present', async () => {
       const result = await authService.register({
         ...existingUsersToCreate[0],
-        password: 'abc'
+        username: 'abc123',
+        password: 'User1-pass'
+      })
+
+      expectAnyError(result)
+    })
+
+    test('failure if username is already present', async () => {
+      const result = await authService.register({
+        ...existingUsersToCreate[0],
+        email: 'user1@test.com',
+        password: 'User1-pass'
       })
 
       expectAnyError(result)
@@ -68,6 +79,15 @@ describe('AuthService', () => {
       const result = await authService.register({
         ...validRegisterForm,
         email: 'user3'
+      })
+
+      expectAnyError(result)
+    })
+
+    test('failure if username is invalid', async () => {
+      const result = await authService.register({
+        ...validRegisterForm,
+        username: 'a'
       })
 
       expectAnyError(result)

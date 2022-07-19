@@ -5,6 +5,10 @@ export default class Validator {
     return EmailValidator.validate(email)
   }
 
+  static validateUsername(username: string): boolean {
+    return /^[a-zA-Z0-9]{4,20}$/.test(username)
+  }
+
   static validatePassword(password: string): boolean {
     // At least one uppercase, one lowercase, one number
     // Minimum 8 characters

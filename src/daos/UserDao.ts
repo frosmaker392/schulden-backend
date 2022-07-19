@@ -1,11 +1,7 @@
 import type { ID, Optional, PartialExceptId, User } from '../CommonTypes'
 import Dao from './Dao'
 
-export interface UserDao extends Dao<User> {
-  getByEmail(email: string): Promise<Optional<User>>
-}
-
-export class UserMemoryDao implements UserDao {
+export class UserMemoryDao implements Dao<User> {
   private users: User[] = []
 
   async create(user: Omit<User, 'id'>): Promise<User> {
@@ -17,11 +13,13 @@ export class UserMemoryDao implements UserDao {
 
   getAll = async (): Promise<User[]> => this.users
 
+  getBy = async <K extends keyof User>(
+    key: K,
+    value: User[K]
+  ): Promise<Optional<User>> => this.users.find((u) => u[key] === value)
+
   getById = async (id: ID): Promise<Optional<User>> =>
     this.users.find((u) => u.id === id)
-
-  getByEmail = async (email: string): Promise<Optional<User>> =>
-    this.users.find((u) => u.email === email)
 
   async update(user: PartialExceptId<User>): Promise<Optional<User>> {
     const userIndex = this.users.findIndex((u) => u.id === user.id)

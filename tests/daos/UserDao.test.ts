@@ -78,23 +78,29 @@ describe('UserMemoryDao', () => {
     })
   })
 
-  describe('getByEmail', () => {
+  describe('getBy', () => {
     beforeEach(async () => {
       createdUsers = await Promise.all(
         testUsers.map(async (testUser) => await userDao.create(testUser))
       )
     })
 
-    test('returns correct user associated with email', async () => {
-      const user = await userDao.getByEmail(createdUsers[0].email)
+    test('returns correct user by email', async () => {
+      const user = await userDao.getBy('email', createdUsers[0].email)
 
       expect(user?.username).toBe(createdUsers[0].username)
+    })
+
+    test('returns correct user by username', async () => {
+      const user = await userDao.getBy('username', createdUsers[0].username)
+
+      expect(user?.email).toBe(createdUsers[0].email)
     })
 
     test('returns undefined if no user is found', async () => {
       for (const testUser of testUsers) userDao.create(testUser)
 
-      const user = await userDao.getByEmail('non-existent-email')
+      const user = await userDao.getBy('email', 'non-existent-email')
 
       expect(user).toBeUndefined()
     })
