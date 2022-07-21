@@ -1,12 +1,9 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
-import { NexusGenUnions } from '../../nexus-typegen'
 import Validator from '../utils/Validator'
 import Dao from '../daos/Dao'
-import { User } from '../CommonTypes'
+import { AuthPayload, User } from '../CommonTypes'
 import { Service } from './Service'
-
-type AuthPayload = NexusGenUnions['AuthPayload']
 
 interface RegisterForm {
   email: string

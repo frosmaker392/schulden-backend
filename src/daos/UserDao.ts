@@ -78,7 +78,8 @@ export class UserNeo4JDao implements Dao<User> {
 
     try {
       const { records } = await session.run(`MATCH (u :User) RETURN u`)
-      result = records.map((r) => r.get('u').properties)
+      result = records.map((r) => r.get('u').properties as User)
+      console.log(result)
     } catch (e) {
       console.log(e)
     } finally {

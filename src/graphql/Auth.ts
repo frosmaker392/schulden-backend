@@ -39,7 +39,7 @@ export const AuthMutation = extendType({
         password: nonNull(stringArg())
       },
       async resolve(parent, args, context) {
-        return context.authService.login(args)
+        return context.services.auth.login(args)
       }
     })
 
@@ -51,7 +51,7 @@ export const AuthMutation = extendType({
         password: nonNull(stringArg())
       },
       async resolve(parent, args, context) {
-        return context.authService.register(args)
+        return context.services.auth.register(args)
       }
     })
   }

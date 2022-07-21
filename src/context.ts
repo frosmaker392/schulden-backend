@@ -2,11 +2,15 @@ import * as Neo4J from 'neo4j-driver'
 
 import { UserNeo4JDao } from './daos/UserDao'
 import { envKeys } from './env'
+import AccountService from './services/AccountService'
 import AuthService from './services/AuthService'
 import { EnvObject } from './utils/EnvExtractor'
 
 export interface Context {
-  authService: AuthService
+  services: {
+    auth: AuthService
+    account: AccountService
+  }
   envObject: EnvObject<typeof envKeys>
 }
 
@@ -16,10 +20,13 @@ export const createContext = (
 ): Context => {
   // Initialize services
   const userDao = new UserNeo4JDao(neo4jDriver)
-  const authService = new AuthService(userDao, envObject.APP_SECRET)
+  const services = {
+    auth: new AuthService(userDao, envObject.APP_SECRET),
+    account: new AccountService(userDao)
+  }
 
   return {
-    authService,
+    services,
     envObject
   }
 }

@@ -14,8 +14,8 @@ export const UserQuery = extendType({
   definition(t) {
     t.nonNull.list.nonNull.field('users', {
       type: 'User',
-      resolve() {
-        return []
+      resolve(parent, args, context) {
+        return context.services.account.getAll()
       }
     })
   }

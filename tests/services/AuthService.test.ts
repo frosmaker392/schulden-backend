@@ -1,6 +1,6 @@
 import AuthService from '../../src/services/AuthService'
 import { UserMemoryDao } from '../../src/daos/UserDao'
-import { NexusGenObjects } from '../../nexus-typegen'
+import type { AuthFailure, AuthSuccess } from '../../src/CommonTypes'
 
 const existingUsersToCreate = [
   {
@@ -25,9 +25,6 @@ const validLoginForm = {
   email: 'user3@test.com',
   password: 'User3-pass'
 }
-
-type AuthSuccess = NexusGenObjects['AuthSuccess']
-type AuthFailure = NexusGenObjects['AuthFailure']
 
 let authService: AuthService
 describe('AuthService', () => {
