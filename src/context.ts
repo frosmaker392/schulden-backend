@@ -1,39 +1,25 @@
-import dotenv from 'dotenv'
+import * as Neo4J from 'neo4j-driver'
 
-import { UserMemoryDao } from './daos/UserDao'
+import { UserNeo4JDao } from './daos/UserDao'
+import { envKeys } from './env'
 import AuthService from './services/AuthService'
-import EnvExtractor, { EnvObject } from './utils/EnvExtractor'
-
-const envKeys = ['PORT', 'APP_SECRET'] as const
-
-const envDefaults: EnvObject<typeof envKeys> = {
-  PORT: '4000',
-  APP_SECRET: 'secret'
-}
+import { EnvObject } from './utils/EnvExtractor'
 
 export interface Context {
   authService: AuthService
   envObject: EnvObject<typeof envKeys>
 }
 
-// Initialize environment variables
-dotenv.config()
+export const createContext = (
+  neo4jDriver: Neo4J.Driver,
+  envObject: EnvObject<typeof envKeys>
+): Context => {
+  // Initialize services
+  const userDao = new UserNeo4JDao(neo4jDriver)
+  const authService = new AuthService(userDao, envObject.APP_SECRET)
 
-const envExtractor = new EnvExtractor(envKeys, envDefaults)
-const { envObject, warnings } = envExtractor.getEnvVariables(
-  process.env,
-  (key, defaultValue) =>
-    `Missing key "${key}" in env file! Defaulting value to "${defaultValue}"`
-)
-
-// Print all warnings for missing env values
-warnings.map(console.warn)
-
-// Initialize services
-const userDao = new UserMemoryDao()
-const authService = new AuthService(userDao, envObject.APP_SECRET)
-
-export const context: Context = {
-  authService,
-  envObject
+  return {
+    authService,
+    envObject
+  }
 }

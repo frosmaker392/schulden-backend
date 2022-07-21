@@ -47,7 +47,7 @@ export default class AuthService extends Service {
 
     const existingUser =
       !!(await this.userDao.getByUnique('email', email)) ||
-      !!(await this.userDao.getByUnique('username', username))
+      !!(await this.userDao.getByUnique('name', username))
     if (existingUser)
       return {
         reason: 'User already exists with this email or username!'
@@ -57,7 +57,7 @@ export default class AuthService extends Service {
 
     const { passwordHash: _, ...user } = await this.userDao.create({
       email,
-      username,
+      name: username,
       passwordHash
     })
 

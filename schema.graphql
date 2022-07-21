@@ -25,5 +25,5 @@ type Query {
 type User {
   email: String!
   id: String!
-  username: String!
+  name: String!
 }

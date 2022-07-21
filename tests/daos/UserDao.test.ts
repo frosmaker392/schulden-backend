@@ -5,25 +5,25 @@ const testUsers: User[] = [
   {
     id: 'test-id-1',
     email: 'userA@test.com',
-    username: 'userA',
+    name: 'userA',
     passwordHash: 'userA-hash'
   },
   {
     id: 'test-id-2',
     email: 'userB@test.com',
-    username: 'userB',
+    name: 'userB',
     passwordHash: 'userB-hash'
   },
   {
     id: 'test-id-2',
     email: 'userB@test.com',
-    username: 'userB',
+    name: 'userB',
     passwordHash: 'userB-hash'
   },
   {
     id: 'test-id-3',
     email: 'userC@test.com',
-    username: 'userC',
+    name: 'userC',
     passwordHash: 'userC-hash'
   }
 ]
@@ -40,7 +40,7 @@ describe('UserMemoryDao', () => {
     expect(user.id).not.toBeUndefined()
     expect(user.id).not.toBe(testUsers[0].id)
     expect(user.email).toBe(testUsers[0].email)
-    expect(user.username).toBe(testUsers[0].username)
+    expect(user.name).toBe(testUsers[0].name)
     expect(user.passwordHash).toBe(testUsers[0].passwordHash)
   })
 
@@ -55,9 +55,9 @@ describe('UserMemoryDao', () => {
       const users = await userDao.getAll()
 
       expect(users).toHaveLength(4)
-      expect(users[0].username).toBe(testUsers[0].username)
-      expect(users[1].username).toBe(testUsers[1].username)
-      expect(users[2].username).toBe(testUsers[2].username)
+      expect(users[0].name).toBe(testUsers[0].name)
+      expect(users[1].name).toBe(testUsers[1].name)
+      expect(users[2].name).toBe(testUsers[2].name)
     })
   })
 
@@ -73,7 +73,7 @@ describe('UserMemoryDao', () => {
       const users = await userDao.getBy('email', createdUsers[1].email)
 
       expect(users).toHaveLength(2)
-      expect(users[0].username).toBe(createdUsers[1].username)
+      expect(users[0].name).toBe(createdUsers[1].name)
     })
 
     test('returns undefined if no user is found', async () => {
@@ -95,7 +95,7 @@ describe('UserMemoryDao', () => {
     test('returns correct user by email', async () => {
       const user = await userDao.getByUnique('email', createdUsers[0].email)
 
-      expect(user?.username).toBe(createdUsers[0].username)
+      expect(user?.name).toBe(createdUsers[0].name)
     })
 
     test('returns undefined if no user is found', async () => {
@@ -117,19 +117,19 @@ describe('UserMemoryDao', () => {
     test('returns updated user', async () => {
       const updatedUser = await userDao.update({
         id: createdUsers[0].id,
-        username: 'updatedUserA'
+        name: 'updatedUserA'
       })
 
-      expect(updatedUser?.username).toBe('updatedUserA')
-      expect(
-        (await userDao.getByUnique('id', createdUsers[0].id))?.username
-      ).toBe('updatedUserA')
+      expect(updatedUser?.name).toBe('updatedUserA')
+      expect((await userDao.getByUnique('id', createdUsers[0].id))?.name).toBe(
+        'updatedUserA'
+      )
     })
 
     test('returns undefined if no user is found', async () => {
       const updatedUser = await userDao.update({
         id: 'non-existent-id',
-        username: 'updatedUsername'
+        name: 'updatedUsername'
       })
 
       expect(updatedUser).toBeUndefined()

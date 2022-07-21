@@ -5,12 +5,12 @@ import { NexusGenObjects } from '../../nexus-typegen'
 const existingUsersToCreate = [
   {
     email: 'user1@test.com',
-    username: 'user1',
+    name: 'user1',
     passwordHash: 'user1-hash'
   },
   {
     email: 'user2@test.com',
-    username: 'user2',
+    name: 'user2',
     passwordHash: 'user2-hash'
   }
 ]
@@ -50,7 +50,7 @@ describe('AuthService', () => {
         user: {
           id: expect.any(String),
           email: 'user3@test.com',
-          username: 'user3'
+          name: 'user3'
         }
       })
     })
@@ -113,7 +113,7 @@ describe('AuthService', () => {
         user: {
           id: expect.any(String),
           email: 'user3@test.com',
-          username: 'user3'
+          name: 'user3'
         }
       })
     })
