@@ -16,10 +16,12 @@ export class UserMemoryDao implements Dao<User> {
   getBy = async <K extends keyof User>(
     key: K,
     value: User[K]
-  ): Promise<Optional<User>> => this.users.find((u) => u[key] === value)
+  ): Promise<User[]> => this.users.filter((u) => u[key] === value)
 
-  getById = async (id: ID): Promise<Optional<User>> =>
-    this.users.find((u) => u.id === id)
+  getByUnique = async <K extends keyof User>(
+    key: K,
+    value: User[K]
+  ): Promise<Optional<User>> => this.users.find((u) => u[key] === value)
 
   async update(user: PartialExceptId<User>): Promise<Optional<User>> {
     const userIndex = this.users.findIndex((u) => u.id === user.id)

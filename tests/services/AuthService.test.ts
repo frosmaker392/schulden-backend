@@ -57,7 +57,7 @@ describe('AuthService', () => {
 
     test('failure if email is already present', async () => {
       const result = await authService.register({
-        ...existingUsersToCreate[0],
+        email: 'user1@test.com',
         username: 'abc123',
         password: 'User1-pass'
       })
@@ -67,8 +67,8 @@ describe('AuthService', () => {
 
     test('failure if username is already present', async () => {
       const result = await authService.register({
-        ...existingUsersToCreate[0],
         email: 'user1@test.com',
+        username: 'user1',
         password: 'User1-pass'
       })
 

@@ -4,6 +4,7 @@ import { NexusGenUnions } from '../../nexus-typegen'
 import Validator from '../utils/Validator'
 import Dao from '../daos/Dao'
 import { User } from '../CommonTypes'
+import { Service } from './Service'
 
 type AuthPayload = NexusGenUnions['AuthPayload']
 
@@ -18,30 +19,35 @@ interface LoginForm {
   password: string
 }
 
-export default class AuthService {
-  constructor(private userDao: Dao<User>, private jwtSecret: string) {}
+export default class AuthService extends Service {
+  private readonly validatorErrors: Record<keyof RegisterForm, string> = {
+    email: 'Invalid email address!',
+    username: 'Username must contain between 4 and 20 alphanumeric characters.',
+    password:
+      'Password must be at least 8 characters long, containing at least one uppercase, one lowercase and one numeric character!'
+  }
+
+  private validator: Validator = new Validator()
+
+  constructor(private userDao: Dao<User>, private jwtSecret: string) {
+    super()
+  }
 
   async register(registerForm: RegisterForm): Promise<AuthPayload> {
     const { email, username, password } = registerForm
 
-    if (!Validator.validateEmail(email))
-      return {
-        reason: 'Invalid email address!'
-      }
-    if (!Validator.validateUsername(username))
-      return {
-        reason:
-          'Username must contain between 4 and 20 alphanumeric characters.'
-      }
-    if (!Validator.validatePassword(password))
-      return {
-        reason:
-          'Password must be at least 8 characters long, containing at least one uppercase, one lowercase and one numeric character!'
-      }
+    for (const k of Object.keys(registerForm)) {
+      const field = k as keyof RegisterForm
+
+      if (!this.validator.validate(field, registerForm[field]))
+        return {
+          reason: this.validatorErrors[field]
+        }
+    }
 
     const existingUser =
-      !!(await this.userDao.getBy('email', email)) ||
-      !!(await this.userDao.getBy('username', username))
+      !!(await this.userDao.getByUnique('email', email)) ||
+      !!(await this.userDao.getByUnique('username', username))
     if (existingUser)
       return {
         reason: 'User already exists with this email or username!'
@@ -67,7 +73,7 @@ export default class AuthService {
     const genericErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
-    const user = await this.userDao.getBy('email', email)
+    const user = await this.userDao.getByUnique('email', email)
     if (!user) return { reason: genericErrorMsg }
 
     const valid = await bcrypt.compare(password, user.passwordHash)

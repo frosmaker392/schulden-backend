@@ -1,18 +1,22 @@
 import * as EmailValidator from 'email-validator'
 
+type Field = 'email' | 'username' | 'password'
+type ValidatorFun = (value: string) => boolean
+
 export default class Validator {
-  static validateEmail(email: string): boolean {
-    return EmailValidator.validate(email)
+  // Between 4 and 20 alphanumeric characters
+  private readonly usernameRegex = /^[a-zA-Z0-9]{4,20}$/
+
+  // At least 8 characters, with at least one lowercase, one uppercase and one digit
+  private readonly passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/
+
+  private readonly validators: Record<Field, ValidatorFun> = {
+    email: (v: string) => EmailValidator.validate(v),
+    username: (v: string) => new RegExp(this.usernameRegex).test(v),
+    password: (v: string) => new RegExp(this.passwordRegex).test(v)
   }
 
-  static validateUsername(username: string): boolean {
-    return /^[a-zA-Z0-9]{4,20}$/.test(username)
-  }
-
-  static validatePassword(password: string): boolean {
-    // At least one uppercase, one lowercase, one number
-    // Minimum 8 characters
-    const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/
-    return passwordRegex.test(password)
+  validate(field: Field, value: string): boolean {
+    return this.validators[field](value)
   }
 }

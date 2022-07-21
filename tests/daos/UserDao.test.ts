@@ -15,6 +15,12 @@ const testUsers: User[] = [
     passwordHash: 'userB-hash'
   },
   {
+    id: 'test-id-2',
+    email: 'userB@test.com',
+    username: 'userB',
+    passwordHash: 'userB-hash'
+  },
+  {
     id: 'test-id-3',
     email: 'userC@test.com',
     username: 'userC',
@@ -48,7 +54,7 @@ describe('UserMemoryDao', () => {
 
       const users = await userDao.getAll()
 
-      expect(users).toHaveLength(3)
+      expect(users).toHaveLength(4)
       expect(users[0].username).toBe(testUsers[0].username)
       expect(users[1].username).toBe(testUsers[1].username)
       expect(users[2].username).toBe(testUsers[2].username)
@@ -56,28 +62,6 @@ describe('UserMemoryDao', () => {
   })
 
   let createdUsers: User[]
-  describe('getById', () => {
-    beforeEach(async () => {
-      createdUsers = await Promise.all(
-        testUsers.map(async (testUser) => await userDao.create(testUser))
-      )
-    })
-
-    test('returns correct user associated with id', async () => {
-      const user = await userDao.getById(createdUsers[0].id)
-
-      expect(user?.username).toBe(createdUsers[0].username)
-    })
-
-    test('returns undefined if no user is found', async () => {
-      for (const testUser of testUsers) userDao.create(testUser)
-
-      const user = await userDao.getById('non-existent-id')
-
-      expect(user).toBeUndefined()
-    })
-  })
-
   describe('getBy', () => {
     beforeEach(async () => {
       createdUsers = await Promise.all(
@@ -85,22 +69,39 @@ describe('UserMemoryDao', () => {
       )
     })
 
-    test('returns correct user by email', async () => {
-      const user = await userDao.getBy('email', createdUsers[0].email)
+    test('returns correct users fulfilling criteria', async () => {
+      const users = await userDao.getBy('email', createdUsers[1].email)
 
-      expect(user?.username).toBe(createdUsers[0].username)
-    })
-
-    test('returns correct user by username', async () => {
-      const user = await userDao.getBy('username', createdUsers[0].username)
-
-      expect(user?.email).toBe(createdUsers[0].email)
+      expect(users).toHaveLength(2)
+      expect(users[0].username).toBe(createdUsers[1].username)
     })
 
     test('returns undefined if no user is found', async () => {
       for (const testUser of testUsers) userDao.create(testUser)
 
-      const user = await userDao.getBy('email', 'non-existent-email')
+      const user = await userDao.getByUnique('email', 'non-existent-email')
+
+      expect(user).toBeUndefined()
+    })
+  })
+
+  describe('getByUnique', () => {
+    beforeEach(async () => {
+      createdUsers = await Promise.all(
+        testUsers.map(async (testUser) => await userDao.create(testUser))
+      )
+    })
+
+    test('returns correct user by email', async () => {
+      const user = await userDao.getByUnique('email', createdUsers[0].email)
+
+      expect(user?.username).toBe(createdUsers[0].username)
+    })
+
+    test('returns undefined if no user is found', async () => {
+      for (const testUser of testUsers) userDao.create(testUser)
+
+      const user = await userDao.getByUnique('email', 'non-existent-email')
 
       expect(user).toBeUndefined()
     })
@@ -120,9 +121,9 @@ describe('UserMemoryDao', () => {
       })
 
       expect(updatedUser?.username).toBe('updatedUserA')
-      expect((await userDao.getById(createdUsers[0].id))?.username).toBe(
-        'updatedUserA'
-      )
+      expect(
+        (await userDao.getByUnique('id', createdUsers[0].id))?.username
+      ).toBe('updatedUserA')
     })
 
     test('returns undefined if no user is found', async () => {
@@ -146,15 +147,17 @@ describe('UserMemoryDao', () => {
       const deletedUser = await userDao.deleteById(createdUsers[1].id)
 
       expect(deletedUser).toEqual(createdUsers[1])
-      expect(await userDao.getAll()).toHaveLength(2)
-      expect(await userDao.getById(createdUsers[1].id)).toBeUndefined()
+      expect(await userDao.getAll()).toHaveLength(3)
+      expect(
+        await userDao.getByUnique('id', createdUsers[1].id)
+      ).toBeUndefined()
     })
 
     test('returns undefined if no user is found', async () => {
       const deletedUser = await userDao.deleteById('non-existent-id')
 
       expect(deletedUser).toBeUndefined()
-      expect(await userDao.getAll()).toHaveLength(3)
+      expect(await userDao.getAll()).toHaveLength(4)
     })
   })
 })
