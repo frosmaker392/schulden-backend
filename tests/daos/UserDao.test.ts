@@ -1,4 +1,4 @@
-import { User } from '../../src/CommonTypes'
+import { User } from '../../src/typeDefs'
 import { UserMemoryDao } from '../../src/daos/UserDao'
 
 const testUsers: User[] = [

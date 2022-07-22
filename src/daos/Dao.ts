@@ -1,4 +1,5 @@
-import type { Optional, PartialExceptId, WithId } from '../CommonTypes'
+import type { WithId } from '../typeDefs'
+import { Optional, PartialExcept } from '../utils/utilityTypes'
 
 export default interface Dao<T extends WithId> {
   create(entity: Omit<T, 'id'>): Promise<T>
@@ -7,6 +8,6 @@ export default interface Dao<T extends WithId> {
   getBy<K extends keyof T>(key: K, value: T[K]): Promise<T[]>
   getByUnique<K extends keyof T>(key: K, value: T[K]): Promise<Optional<T>>
 
-  update(entity: PartialExceptId<T>): Promise<Optional<T>>
+  update(entity: PartialExcept<T, 'id'>): Promise<Optional<T>>
   deleteById(id: T['id']): Promise<Optional<T>>
 }

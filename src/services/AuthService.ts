@@ -2,8 +2,9 @@ import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
 import Dao from '../daos/Dao'
-import { AuthPayload, User } from '../CommonTypes'
+import { GAuthPayload, User } from '../typeDefs'
 import { Service } from './Service'
+import UserAdapter from '../adapters/UserAdapter'
 
 interface RegisterForm {
   email: string
@@ -25,12 +26,13 @@ export default class AuthService extends Service {
   }
 
   private validator: Validator = new Validator()
+  private userAdapter: UserAdapter = new UserAdapter()
 
   constructor(private userDao: Dao<User>, private jwtSecret: string) {
     super()
   }
 
-  async register(registerForm: RegisterForm): Promise<AuthPayload> {
+  async register(registerForm: RegisterForm): Promise<GAuthPayload> {
     const { email, username, password } = registerForm
 
     for (const k of Object.keys(registerForm)) {
@@ -52,21 +54,22 @@ export default class AuthService extends Service {
 
     const passwordHash = await bcrypt.hash(password, 10)
 
-    const { passwordHash: _, ...user } = await this.userDao.create({
+    const user = await this.userDao.create({
       email,
       name: username,
       passwordHash
     })
+    const gUser = this.userAdapter.toGUser(user)
 
     const token = jwt.sign({ userId: user.id }, this.jwtSecret)
 
     return {
       token,
-      user
+      user: gUser
     }
   }
 
-  async login(loginForm: LoginForm): Promise<AuthPayload> {
+  async login(loginForm: LoginForm): Promise<GAuthPayload> {
     const genericErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
@@ -78,11 +81,9 @@ export default class AuthService extends Service {
 
     const token = jwt.sign({ userId: user.id }, this.jwtSecret)
 
-    const { passwordHash: _, ...returnedUser } = user
-
     return {
       token,
-      user: returnedUser
+      user: this.userAdapter.toGUser(user)
     }
   }
 }

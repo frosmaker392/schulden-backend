@@ -1,7 +1,8 @@
 import * as Neo4J from 'neo4j-driver'
 import { nanoid } from 'nanoid'
 
-import type { ID, Optional, PartialExceptId, User } from '../CommonTypes'
+import type { User, ID } from '../typeDefs'
+import { Optional, PartialExcept } from '../utils/utilityTypes'
 import Dao from './Dao'
 
 export class UserMemoryDao implements Dao<User> {
@@ -26,7 +27,7 @@ export class UserMemoryDao implements Dao<User> {
     value: User[K]
   ): Promise<Optional<User>> => this.users.find((u) => u[key] === value)
 
-  async update(user: PartialExceptId<User>): Promise<Optional<User>> {
+  async update(user: PartialExcept<User, 'id'>): Promise<Optional<User>> {
     const userIndex = this.users.findIndex((u) => u.id === user.id)
 
     if (userIndex >= 0) {
@@ -136,7 +137,7 @@ export class UserNeo4JDao implements Dao<User> {
     return result
   }
 
-  async update(entity: PartialExceptId<User>): Promise<Optional<User>> {
+  async update(entity: PartialExcept<User, 'id'>): Promise<Optional<User>> {
     const session = this.neo4jDriver.session()
     let result: Optional<User> = undefined
 
