@@ -2,7 +2,7 @@ import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
 import Dao from '../daos/Dao'
-import { GAuthPayload, User } from '../typeDefs'
+import { AuthTokenPayload, GAuthPayload, User } from '../typeDefs'
 import { Service } from './Service'
 import UserAdapter from '../adapters/UserAdapter'
 
@@ -61,7 +61,10 @@ export default class AuthService extends Service {
     })
     const gUser = this.userAdapter.toGUser(user)
 
-    const token = jwt.sign({ userId: user.id }, this.jwtSecret)
+    const authTokenPayload: AuthTokenPayload = {
+      userId: user.id
+    }
+    const token = jwt.sign(authTokenPayload, this.jwtSecret)
 
     return {
       token,
@@ -70,16 +73,19 @@ export default class AuthService extends Service {
   }
 
   async login(loginForm: LoginForm): Promise<GAuthPayload> {
-    const genericErrorMsg = 'Invalid email and password combination!'
+    const loginErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
     const user = await this.userDao.getByUnique('email', email)
-    if (!user) return { reason: genericErrorMsg }
+    if (!user) return { reason: loginErrorMsg }
 
     const valid = await bcrypt.compare(password, user.passwordHash)
-    if (!valid) return { reason: genericErrorMsg }
+    if (!valid) return { reason: loginErrorMsg }
 
-    const token = jwt.sign({ userId: user.id }, this.jwtSecret)
+    const authTokenPayload: AuthTokenPayload = {
+      userId: user.id
+    }
+    const token = jwt.sign(authTokenPayload, this.jwtSecret)
 
     return {
       token,

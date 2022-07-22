@@ -1,11 +1,18 @@
 import dotenv from 'dotenv'
 import EnvExtractor, { EnvObject } from './utils/EnvExtractor'
 
-export const envKeys = ['PORT', 'APP_SECRET'] as const
+export const envKeys = [
+  'PORT',
+  'APP_SECRET',
+  'NEO4J_USERNAME',
+  'NEO4J_PASSWORD'
+] as const
 
 const envDefaults: EnvObject<typeof envKeys> = {
   PORT: '4000',
-  APP_SECRET: 'secret'
+  APP_SECRET: 'secret',
+  NEO4J_USERNAME: 'neo4j',
+  NEO4J_PASSWORD: 'password'
 }
 
 // Initialize environment variables

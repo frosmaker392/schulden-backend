@@ -7,6 +7,10 @@ export interface WithId {
   id: ID
 }
 
+export interface AuthTokenPayload {
+  userId: string
+}
+
 // GraphQL types, derived from nexus-typegen
 export type GUser = NexusGenObjects['User']
 
