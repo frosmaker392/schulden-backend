@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
-import Dao from '../daos/Dao'
-import { AuthTokenPayload, GAuthPayload, User } from '../typeDefs'
+import { AuthTokenPayload, GAuthPayload } from '../typeDefs'
 import { Service } from './Service'
 import UserAdapter from '../adapters/UserAdapter'
+import { UserDao } from '../daos/UserDao'
 
 interface RegisterForm {
   email: string
@@ -28,7 +28,7 @@ export default class AuthService extends Service {
   private validator: Validator = new Validator()
   private userAdapter: UserAdapter = new UserAdapter()
 
-  constructor(private userDao: Dao<User>, private jwtSecret: string) {
+  constructor(private userDao: UserDao, private jwtSecret: string) {
     super()
   }
 
@@ -44,10 +44,9 @@ export default class AuthService extends Service {
         }
     }
 
-    const existingUser =
-      !!(await this.userDao.getByUnique('email', email)) ||
-      !!(await this.userDao.getByUnique('name', username))
-    if (existingUser)
+    const userExists =
+      (await this.userDao.getManyByNameOrEmail(username, email)).length > 0
+    if (userExists)
       return {
         reason: 'User already exists with this email or username!'
       }
@@ -76,7 +75,7 @@ export default class AuthService extends Service {
     const loginErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
-    const user = await this.userDao.getByUnique('email', email)
+    const user = await this.userDao.getUnique('email', email)
     if (!user) return { reason: loginErrorMsg }
 
     const valid = await bcrypt.compare(password, user.passwordHash)

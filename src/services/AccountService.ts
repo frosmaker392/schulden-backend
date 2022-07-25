@@ -1,12 +1,12 @@
-import { GUser, User } from '../typeDefs'
-import Dao from '../daos/Dao'
+import { GUser } from '../typeDefs'
 import { Service } from './Service'
 import UserAdapter from '../adapters/UserAdapter'
+import { UserDao } from '../daos/UserDao'
 
 export default class AccountService extends Service {
   private userAdapter: UserAdapter = new UserAdapter()
 
-  constructor(private userDao: Dao<User>) {
+  constructor(private userDao: UserDao) {
     super()
   }
 

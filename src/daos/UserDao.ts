@@ -4,8 +4,13 @@ import { nanoid } from 'nanoid'
 import type { User, ID } from '../typeDefs'
 import { Optional, PartialExcept } from '../utils/utilityTypes'
 import Dao from './Dao'
+import Neo4JUtil from '../utils/Neo4JUtil'
 
-export class UserMemoryDao implements Dao<User> {
+export interface UserDao extends Dao<User> {
+  getManyByNameOrEmail(name: string, email: string): Promise<User[]>
+}
+
+export class UserMemoryDao implements UserDao {
   private users: User[] = []
 
   async create(user: Omit<User, 'id'>): Promise<User> {
@@ -16,16 +21,17 @@ export class UserMemoryDao implements Dao<User> {
   }
 
   getAll = async (): Promise<User[]> => this.users
-
-  getBy = async <K extends keyof User>(
+  getMany = async <K extends keyof User>(
     key: K,
     value: User[K]
   ): Promise<User[]> => this.users.filter((u) => u[key] === value)
-
-  getByUnique = async <K extends keyof User>(
+  getUnique = async <K extends keyof User>(
     key: K,
     value: User[K]
   ): Promise<Optional<User>> => this.users.find((u) => u[key] === value)
+
+  getManyByNameOrEmail = async (name: string, email: string): Promise<User[]> =>
+    this.users.filter((u) => u.name === name || u.email === email)
 
   async update(user: PartialExcept<User, 'id'>): Promise<Optional<User>> {
     const userIndex = this.users.findIndex((u) => u.id === user.id)
@@ -45,144 +51,97 @@ export class UserMemoryDao implements Dao<User> {
   }
 }
 
-export class UserNeo4JDao implements Dao<User> {
+export class UserNeo4JDao implements UserDao {
   constructor(private neo4jDriver: Neo4J.Driver) {}
 
   async create(entity: Omit<User, 'id'>): Promise<User> {
-    const session = this.neo4jDriver.session()
     const id = nanoid()
 
-    let user: User = { id: 'error', ...entity }
-
-    try {
-      const { records } = await session.run(
-        `CREATE (user :User { id: $id, name: $name, email: $email, passwordHash: $passwordHash }) 
+    return await Neo4JUtil.runQuery(
+      this.neo4jDriver,
+      'write',
+      async (session) => {
+        const { records } = await session.run(
+          `CREATE (user :User { id: $id, name: $name, email: $email, passwordHash: $passwordHash }) 
         RETURN user`,
-        { id, ...entity }
-      )
+          { id, ...entity }
+        )
 
-      user = records[0].get('user').properties as User
-    } catch (e) {
-      console.log(e)
-    } finally {
-      session.close()
-    }
-
-    return user
+        return records[0].get('user').properties
+      }
+    )
   }
 
   async getAll(): Promise<User[]> {
-    const session = this.neo4jDriver.session({
-      defaultAccessMode: Neo4J.session.READ
-    })
-    let result: User[] = []
-
-    try {
+    return Neo4JUtil.runQuery(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(`MATCH (u :User) RETURN u`)
-      result = records.map((r) => r.get('u').properties as User)
-      console.log(result)
-    } catch (e) {
-      console.log(e)
-    } finally {
-      session.close()
-    }
-
-    return result
+      return records.map((r) => r.get('u').properties)
+    })
   }
 
-  async getBy<K extends keyof User>(key: K, value: User[K]): Promise<User[]> {
-    const session = this.neo4jDriver.session({
-      defaultAccessMode: Neo4J.session.READ
-    })
-    let result: User[] = []
-
-    try {
+  async getMany<K extends keyof User>(key: K, value: User[K]): Promise<User[]> {
+    return Neo4JUtil.runQuery(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
         `MATCH (u :User { ${key} : $value }) RETURN u`,
         { value }
       )
 
-      result = records.map((r) => r.get('u').properties)
-    } catch (e) {
-      console.log(e)
-    } finally {
-      session.close()
-    }
-
-    return result
+      return records.map((r) => r.get('u').properties)
+    })
   }
 
-  async getByUnique<K extends keyof User>(
+  async getUnique<K extends keyof User>(
     key: K,
     value: User[K]
   ): Promise<Optional<User>> {
-    const session = this.neo4jDriver.session({
-      defaultAccessMode: Neo4J.session.READ
-    })
-    let result: Optional<User> = undefined
-
-    try {
+    return Neo4JUtil.runQuery(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
-        `MATCH (u :User { ${key} : $value }) RETURN u`,
+        `MATCH (u :User { ${key} : $value }) RETURN DISTINCT u`,
         { value }
       )
 
-      result = records.at(0)?.get('u').properties as User
-    } catch (e) {
-      console.log(e)
-    } finally {
-      session.close()
-    }
-
-    return result
+      return records.at(0)?.get('u').properties
+    })
   }
 
-  async update(entity: PartialExcept<User, 'id'>): Promise<Optional<User>> {
-    const session = this.neo4jDriver.session()
-    let result: Optional<User> = undefined
-
-    const keyValueCsv = Object.entries(entity)
-      .filter(([key]) => key !== 'id')
-      .map(([key, value]) => `${key}: "${value}"`)
-      .join(', ')
-    const fieldsToUpdate = `{ ${keyValueCsv} }`
-
-    try {
+  async getManyByNameOrEmail(name: string, email: string): Promise<User[]> {
+    return Neo4JUtil.runQuery(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
-        `MATCH (u :User { id : $id }) 
-        ${fieldsToUpdate}
-        RETURN u`,
-        { id: entity.id }
+        `MATCH (u :User) 
+        WHERE u.name = $name OR u.email = $email
+        RETURN DISTINCT u`,
+        { name, email }
       )
 
-      result = records.at(0)?.get('u').properties as User
-    } catch (e) {
-      console.log(e)
-    } finally {
-      session.close()
-    }
+      return records.map((r) => r.get('u').properties)
+    })
+  }
 
-    return result
+  async update({
+    id,
+    ...fieldsToUpdate
+  }: PartialExcept<User, 'id'>): Promise<Optional<User>> {
+    return Neo4JUtil.runQuery(this.neo4jDriver, 'write', async (session) => {
+      const { records } = await session.run(
+        `MATCH (u :User { id : $id }) 
+        SET u += $fieldsToUpdate
+        RETURN u`,
+        { id, fieldsToUpdate }
+      )
+
+      return records.at(0)?.get('u').properties
+    })
   }
 
   async deleteById(id: string): Promise<Optional<User>> {
-    const session = this.neo4jDriver.session()
-    let result: Optional<User> = undefined
-
-    try {
+    return Neo4JUtil.runQuery(this.neo4jDriver, 'write', async (session) => {
       const { records } = await session.run(
         `MATCH (u :User { id : $id }) 
         DELETE u`,
         { id }
       )
 
-      result = records.at(0)?.get('u').properties as User
-    } catch (e) {
-      console.log(e)
-    } finally {
-      session.close()
-    }
-
-    return result
+      return records.at(0)?.get('u').properties
+    })
   }
 }

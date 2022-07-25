@@ -62,30 +62,27 @@ describe('UserMemoryDao', () => {
   })
 
   let createdUsers: User[]
-  describe('getBy', () => {
+  describe('getMany', () => {
     beforeEach(async () => {
       createdUsers = await Promise.all(
         testUsers.map(async (testUser) => await userDao.create(testUser))
       )
     })
 
-    test('returns correct users fulfilling criteria', async () => {
-      const users = await userDao.getBy('email', createdUsers[1].email)
+    test('returns correct users', async () => {
+      const users = await userDao.getMany('email', createdUsers[1].email)
 
-      expect(users).toHaveLength(2)
-      expect(users[0].name).toBe(createdUsers[1].name)
+      expect(users).toEqual([createdUsers[1], createdUsers[2]])
     })
 
-    test('returns undefined if no user is found', async () => {
-      for (const testUser of testUsers) userDao.create(testUser)
+    test('returns empty array if no user is found', async () => {
+      const user = await userDao.getMany('email', 'non-existent-email')
 
-      const user = await userDao.getByUnique('email', 'non-existent-email')
-
-      expect(user).toBeUndefined()
+      expect(user).toHaveLength(0)
     })
   })
 
-  describe('getByUnique', () => {
+  describe('getUnique', () => {
     beforeEach(async () => {
       createdUsers = await Promise.all(
         testUsers.map(async (testUser) => await userDao.create(testUser))
@@ -93,17 +90,41 @@ describe('UserMemoryDao', () => {
     })
 
     test('returns correct user by email', async () => {
-      const user = await userDao.getByUnique('email', createdUsers[0].email)
+      const user = await userDao.getUnique('email', createdUsers[0].email)
 
-      expect(user?.name).toBe(createdUsers[0].name)
+      expect(user).toEqual(createdUsers[0])
     })
 
     test('returns undefined if no user is found', async () => {
-      for (const testUser of testUsers) userDao.create(testUser)
-
-      const user = await userDao.getByUnique('email', 'non-existent-email')
+      const user = await userDao.getUnique('email', 'non-existent-email')
 
       expect(user).toBeUndefined()
+    })
+  })
+
+  describe('getManyByNameAndEmail', () => {
+    beforeEach(async () => {
+      createdUsers = await Promise.all(
+        testUsers.map(async (testUser) => await userDao.create(testUser))
+      )
+    })
+
+    test('returns correct users', async () => {
+      const users = await userDao.getManyByNameOrEmail(
+        createdUsers[1].name,
+        createdUsers[0].email
+      )
+
+      expect(users).toEqual([createdUsers[0], createdUsers[1], createdUsers[2]])
+    })
+
+    test('returns empty array if no user is found', async () => {
+      const user = await userDao.getManyByNameOrEmail(
+        'non-existent-name',
+        'non-existent-email'
+      )
+
+      expect(user).toEqual([])
     })
   })
 
@@ -121,7 +142,7 @@ describe('UserMemoryDao', () => {
       })
 
       expect(updatedUser?.name).toBe('updatedUserA')
-      expect((await userDao.getByUnique('id', createdUsers[0].id))?.name).toBe(
+      expect((await userDao.getUnique('id', createdUsers[0].id))?.name).toBe(
         'updatedUserA'
       )
     })
@@ -148,9 +169,7 @@ describe('UserMemoryDao', () => {
 
       expect(deletedUser).toEqual(createdUsers[1])
       expect(await userDao.getAll()).toHaveLength(3)
-      expect(
-        await userDao.getByUnique('id', createdUsers[1].id)
-      ).toBeUndefined()
+      expect(await userDao.getUnique('id', createdUsers[1].id)).toBeUndefined()
     })
 
     test('returns undefined if no user is found', async () => {

@@ -3,3 +3,6 @@ node_modules
 
 # Generated files from testing
 coverage
+
+# Database
+neo4j
