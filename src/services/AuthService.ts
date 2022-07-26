@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
-import { AuthTokenPayload, GAuthPayload } from '../typeDefs'
+import { AuthTokenPayload, GAuthResult } from '../typeDefs'
 import { Service } from './Service'
 import UserAdapter from '../adapters/UserAdapter'
 import { UserDao } from '../daos/UserDao'
@@ -32,7 +32,7 @@ export default class AuthService extends Service {
     super()
   }
 
-  async register(registerForm: RegisterForm): Promise<GAuthPayload> {
+  async register(registerForm: RegisterForm): Promise<GAuthResult> {
     const { email, username, password } = registerForm
 
     for (const k of Object.keys(registerForm)) {
@@ -40,7 +40,7 @@ export default class AuthService extends Service {
 
       if (!this.validator.validate(field, registerForm[field]))
         return {
-          reason: this.validatorErrors[field]
+          errorMessage: this.validatorErrors[field]
         }
     }
 
@@ -48,7 +48,7 @@ export default class AuthService extends Service {
       (await this.userDao.getManyByNameOrEmail(username, email)).length > 0
     if (userExists)
       return {
-        reason: 'User already exists with this email or username!'
+        errorMessage: 'User already exists with this email or username!'
       }
 
     const passwordHash = await bcrypt.hash(password, 10)
@@ -58,7 +58,6 @@ export default class AuthService extends Service {
       name: username,
       passwordHash
     })
-    const gUser = this.userAdapter.toGUser(user)
 
     const authTokenPayload: AuthTokenPayload = {
       userId: user.id
@@ -67,19 +66,19 @@ export default class AuthService extends Service {
 
     return {
       token,
-      user: gUser
+      user: UserAdapter.toGUser(user)
     }
   }
 
-  async login(loginForm: LoginForm): Promise<GAuthPayload> {
+  async login(loginForm: LoginForm): Promise<GAuthResult> {
     const loginErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
     const user = await this.userDao.getUnique('email', email)
-    if (!user) return { reason: loginErrorMsg }
+    if (!user) return { errorMessage: loginErrorMsg }
 
     const valid = await bcrypt.compare(password, user.passwordHash)
-    if (!valid) return { reason: loginErrorMsg }
+    if (!valid) return { errorMessage: loginErrorMsg }
 
     const authTokenPayload: AuthTokenPayload = {
       userId: user.id
@@ -88,7 +87,7 @@ export default class AuthService extends Service {
 
     return {
       token,
-      user: this.userAdapter.toGUser(user)
+      user: UserAdapter.toGUser(user)
     }
   }
 }

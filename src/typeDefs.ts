@@ -13,10 +13,13 @@ export interface AuthTokenPayload {
 
 // GraphQL types, derived from nexus-typegen
 export type GUser = NexusGenObjects['User']
+export type GUsers = NexusGenObjects['Users']
+export type GUserResult = NexusGenUnions['UserResult']
+export type GUsersResult = NexusGenUnions['UsersResult']
 
-export type GAuthPayload = NexusGenUnions['AuthPayload']
-export type GAuthSuccess = NexusGenObjects['AuthSuccess']
-export type GAuthFailure = NexusGenObjects['AuthFailure']
+export type GAuthResult = NexusGenUnions['AuthResult']
+export type GAuthPayload = NexusGenObjects['AuthPayload']
+export type GError = NexusGenObjects['Error']
 
 // DB types
 export interface User extends WithId {

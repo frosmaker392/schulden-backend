@@ -1,7 +1,7 @@
 import { extendType, nonNull, objectType, stringArg, unionType } from 'nexus'
 
-export const AuthSuccess = objectType({
-  name: 'AuthSuccess',
+export const AuthPayload = objectType({
+  name: 'AuthPayload',
   definition(t) {
     t.nonNull.string('token')
     t.nonNull.field('user', {
@@ -10,22 +10,15 @@ export const AuthSuccess = objectType({
   }
 })
 
-export const AuthFailure = objectType({
-  name: 'AuthFailure',
-  definition(t) {
-    t.nonNull.string('reason')
-  }
-})
-
-export const AuthPayload = unionType({
-  name: 'AuthPayload',
+export const AuthResult = unionType({
+  name: 'AuthResult',
   resolveType(data) {
-    const __typename = 'token' in data ? 'AuthSuccess' : 'AuthFailure'
+    const __typename = 'token' in data ? 'AuthPayload' : 'Error'
 
     return __typename
   },
   definition(t) {
-    t.members('AuthSuccess', 'AuthFailure')
+    t.members('AuthPayload', 'Error')
   }
 })
 
@@ -33,7 +26,7 @@ export const AuthMutation = extendType({
   type: 'Mutation',
   definition(t) {
     t.nonNull.field('login', {
-      type: 'AuthPayload',
+      type: 'AuthResult',
       args: {
         email: nonNull(stringArg()),
         password: nonNull(stringArg())
@@ -44,7 +37,7 @@ export const AuthMutation = extendType({
     })
 
     t.nonNull.field('register', {
-      type: 'AuthPayload',
+      type: 'AuthResult',
       args: {
         username: nonNull(stringArg()),
         email: nonNull(stringArg()),

@@ -2,24 +2,31 @@
 ### Do not make changes to this file directly
 
 
-type AuthFailure {
-  reason: String!
-}
-
-union AuthPayload = AuthFailure | AuthSuccess
-
-type AuthSuccess {
+type AuthPayload {
   token: String!
   user: User!
 }
 
+union AuthResult = AuthPayload | Error
+
+type Error {
+  errorMessage: String!
+}
+
 type Mutation {
-  login(email: String!, password: String!): AuthPayload!
-  register(email: String!, password: String!, username: String!): AuthPayload!
+  login(email: String!, password: String!): AuthResult!
+  register(email: String!, password: String!, username: String!): AuthResult!
 }
 
 type Query {
+  updateUser(id: String!, password: String, username: String): UserResult!
   users: [User!]!
+}
+
+type RegisterValidationError {
+  emailErrorMessage: String
+  passwordErrorMessage: String
+  usernameErrorMessage: String
 }
 
 type User {
@@ -27,3 +34,11 @@ type User {
   id: String!
   username: String!
 }
+
+union UserResult = Error | User
+
+type Users {
+  list: [User!]!
+}
+
+union UsersResult = Error | Users

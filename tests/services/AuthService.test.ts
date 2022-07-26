@@ -1,6 +1,6 @@
 import AuthService from '../../src/services/AuthService'
 import { UserMemoryDao } from '../../src/daos/UserDao'
-import type { GAuthFailure, GAuthSuccess } from '../../src/typeDefs'
+import type { GError, GAuthPayload } from '../../src/typeDefs'
 
 const existingUsersToCreate = [
   {
@@ -36,13 +36,13 @@ describe('AuthService', () => {
   })
 
   const expectAnyError = (obj: unknown) =>
-    expect(obj).toEqual<GAuthFailure>({ reason: expect.any(String) })
+    expect(obj).toEqual<GError>({ errorMessage: expect.any(String) })
 
   describe('register', () => {
     test('success with a different email', async () => {
       const result = await authService.register(validRegisterForm)
 
-      expect(result).toEqual<GAuthSuccess>({
+      expect(result).toEqual<GAuthPayload>({
         token: expect.any(String),
         user: {
           id: expect.any(String),
@@ -105,7 +105,7 @@ describe('AuthService', () => {
       await authService.register(validRegisterForm)
       const result = await authService.login(validLoginForm)
 
-      expect(result).toEqual<GAuthSuccess>({
+      expect(result).toEqual<GAuthPayload>({
         token: expect.any(String),
         user: {
           id: expect.any(String),
