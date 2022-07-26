@@ -2,15 +2,8 @@
 
 ## Running the project
 
-1. Run the docker container with the database using the following command:
-```
-docker run \
-    --name schulden-db \
-    --restart always \
-    --publish=7474:7474 --publish=7687:7687 \
-    --volume=$HOME/neo4j/data:/data \
-    neo4j:4.4.8
-```
+0. Make sure the folder neo4j/data is present before running the following docker command, as it serves as the mount point for the container to persist its data.
+1. Run the docker container with the database using `docker compose up -d`.
 2. Run `npm install` to install all dependencies.
 3. Run `npm run dev` for the development server.
 
