@@ -16,10 +16,10 @@ type Error {
 type Mutation {
   login(email: String!, password: String!): AuthResult!
   register(email: String!, password: String!, username: String!): AuthResult!
+  updateUser(id: String!, password: String, username: String): UserResult!
 }
 
 type Query {
-  updateUser(id: String!, password: String, username: String): UserResult!
   users: [User!]!
 }
 

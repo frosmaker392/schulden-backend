@@ -50,7 +50,12 @@ export const UserQuery = extendType({
         return context.services.account.getAll()
       }
     })
+  }
+})
 
+export const UserMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
     t.nonNull.field('updateUser', {
       type: 'UserResult',
       args: {

@@ -76,9 +76,9 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     login: NexusGenRootTypes['AuthResult']; // AuthResult!
     register: NexusGenRootTypes['AuthResult']; // AuthResult!
+    updateUser: NexusGenRootTypes['UserResult']; // UserResult!
   }
   Query: { // field return type
-    updateUser: NexusGenRootTypes['UserResult']; // UserResult!
     users: NexusGenRootTypes['User'][]; // [User!]!
   }
   RegisterValidationError: { // field return type
@@ -107,9 +107,9 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     login: 'AuthResult'
     register: 'AuthResult'
+    updateUser: 'UserResult'
   }
   Query: { // field return type name
-    updateUser: 'UserResult'
     users: 'User'
   }
   RegisterValidationError: { // field return type name
@@ -138,8 +138,6 @@ export interface NexusGenArgTypes {
       password: string; // String!
       username: string; // String!
     }
-  }
-  Query: {
     updateUser: { // args
       id: string; // String!
       password?: string | null; // String
