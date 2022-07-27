@@ -2,10 +2,10 @@
 
 ## Running the project
 
-0. Make sure the folder neo4j/data is present before running the following docker command, as it serves as the mount point for the container to persist its data.
-1. Run the docker container with the database using `docker compose up -d`.
-2. Run `npm install` to install all dependencies.
-3. Run `npm run dev` for the development server.
+1. Make sure the folders neo4j/data and neo4j/logs are present in the project directory.
+2. Run the docker container with the database using `docker compose up -d`.
+3. Run `npm install` to install all dependencies.
+4. Run `npm run dev` for the development server.
 
 ## Commands
 

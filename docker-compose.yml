@@ -9,8 +9,10 @@ services:
       - 7687:7687
     volumes:
       - ./neo4j/data:/data
+      - ./neo4j/logs:/logs
     environment:
-      - NEO4J_AUTH=neo4j/test
+      - NEO4J_AUTH=neo4j/YourPasswordHere123
       - NEO4J_dbms_memory_pagecache_size=1G
-      - NEO4J_dbms.memory.heap.initial_size=1G
+      - NEO4J_dbms_memory_heap_initial__size=1G
       - NEO4J_dbms_memory_heap_max__size=1G
+    restart: "unless-stopped"
