@@ -1,3 +1,4 @@
+import UserAdapter from '../../src/adapters/UserAdapter'
 import { UserDao, UserMemoryDao } from '../../src/daos/UserDao'
 import AccountService from '../../src/services/AccountService'
 import { GError, GUser, User } from '../../src/typeDefs'
@@ -54,6 +55,21 @@ describe('AccountService', () => {
           email: 'testUser3@email.com'
         }
       ])
+    })
+  })
+
+  describe('user', () => {
+    test('returns user if available', async () => {
+      const user = await accountService.getUser(createdUsers[0].id)
+
+      expect(user).toEqual<GUser>(UserAdapter.toGUser(createdUsers[0]))
+    })
+
+    test('returns undefined if not available or no user id given', async () => {
+      const user = await accountService.getUser('non-existent-id')
+
+      expect(user).toBeUndefined()
+      expect(await accountService.getUser()).toBeUndefined()
     })
   })
 

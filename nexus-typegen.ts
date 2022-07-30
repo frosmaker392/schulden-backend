@@ -79,7 +79,7 @@ export interface NexusGenFieldTypes {
     updateUser: NexusGenRootTypes['UserResult']; // UserResult!
   }
   Query: { // field return type
-    users: NexusGenRootTypes['User'][]; // [User!]!
+    user: NexusGenRootTypes['User'] | null; // User
   }
   RegisterValidationError: { // field return type
     emailErrorMessage: string | null; // String
@@ -110,7 +110,7 @@ export interface NexusGenFieldTypeNames {
     updateUser: 'UserResult'
   }
   Query: { // field return type name
-    users: 'User'
+    user: 'User'
   }
   RegisterValidationError: { // field return type name
     emailErrorMessage: 'String'

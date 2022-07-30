@@ -18,7 +18,16 @@ export default class AccountService extends Service {
   }
 
   async getAll(): Promise<GUser[]> {
-    return (await this.userDao.getAll()).map((u) => UserAdapter.toGUser(u))
+    const users = await this.userDao.getAll()
+    return users.map((u) => UserAdapter.toGUser(u))
+  }
+
+  async getUser(id?: string): Promise<Optional<GUser>> {
+    if (!id) return undefined
+    const user = await this.userDao.getUnique('id', id)
+
+    if (!user) return undefined
+    return UserAdapter.toGUser(user)
   }
 
   async update(

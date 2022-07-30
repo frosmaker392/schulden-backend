@@ -44,10 +44,10 @@ export const UsersResult = unionType({
 export const UserQuery = extendType({
   type: 'Query',
   definition(t) {
-    t.nonNull.list.nonNull.field('users', {
+    t.field('user', {
       type: 'User',
-      resolve(parent, args, context) {
-        return context.services.account.getAll()
+      async resolve(parent, args, { services, userId }) {
+        return (await services.account.getUser(userId)) ?? null
       }
     })
   }
@@ -63,10 +63,9 @@ export const UserMutation = extendType({
         username: stringArg(),
         password: stringArg()
       },
-      resolve(parent, args, context) {
-        const actorID = context.userId
+      resolve(parent, args, { services, userId }) {
         const userToUpdate = ArgsAdapter.replaceNullsWithUndefineds(args)
-        return context.services.account.update(userToUpdate, actorID)
+        return services.account.update(userToUpdate, userId)
       }
     })
   }
