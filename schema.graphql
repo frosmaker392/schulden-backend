@@ -19,7 +19,7 @@ type Mutation {
 }
 
 type Query {
-  ok: Boolean!
+  currentUser: UserResult
 }
 
 type RegisterValidationError {
@@ -33,3 +33,5 @@ type User {
   id: String!
   username: String!
 }
+
+union UserResult = Error | User

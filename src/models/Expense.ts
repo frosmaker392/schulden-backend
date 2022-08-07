@@ -1,10 +1,9 @@
-import { ID } from '../typeDefs'
 import { Debtor } from './Debt'
 import { Person } from './Person'
 
 export class Expense {
   constructor(
-    private _id: ID,
+    private _id: string,
     private _name: string,
     private _timestamp: Date,
     private _totalAmount: number,
@@ -12,7 +11,7 @@ export class Expense {
     private _debtors: Debtor[]
   ) {}
 
-  public get id(): ID {
+  public get id(): string {
     return this._id
   }
 

@@ -54,6 +54,7 @@ export interface NexusGenInterfaces {
 
 export interface NexusGenUnions {
   AuthResult: NexusGenRootTypes['AuthPayload'] | NexusGenRootTypes['Error'];
+  UserResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['User'];
 }
 
 export type NexusGenRootTypes = NexusGenObjects & NexusGenUnions
@@ -73,7 +74,7 @@ export interface NexusGenFieldTypes {
     register: NexusGenRootTypes['AuthResult']; // AuthResult!
   }
   Query: { // field return type
-    ok: boolean; // Boolean!
+    currentUser: NexusGenRootTypes['UserResult'] | null; // UserResult
   }
   RegisterValidationError: { // field return type
     emailErrorMessage: string | null; // String
@@ -100,7 +101,7 @@ export interface NexusGenFieldTypeNames {
     register: 'AuthResult'
   }
   Query: { // field return type name
-    ok: 'Boolean'
+    currentUser: 'UserResult'
   }
   RegisterValidationError: { // field return type name
     emailErrorMessage: 'String'
@@ -130,6 +131,7 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {
   AuthResult: "AuthPayload" | "Error"
+  UserResult: "Error" | "User"
 }
 
 export interface NexusGenTypeInterfaces {
@@ -149,7 +151,7 @@ export type NexusGenUnionNames = keyof NexusGenUnions;
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
-export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult";
+export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult" | "UserResult";
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

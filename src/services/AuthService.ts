@@ -1,10 +1,11 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
-import { JWTPayload, GAuthResult } from '../typeDefs'
+import { JWTPayload, GAuthResult, GUser } from '../typeDefs'
 import { Service } from './Service'
 import UserAdapter from '../adapters/UserAdapter'
 import { UserDao } from '../daos/UserDao'
+import { Optional } from '../utils/utilityTypes'
 
 interface RegisterForm {
   email: string
@@ -89,5 +90,10 @@ export default class AuthService extends Service {
       token,
       user: UserAdapter.toGUser(user)
     }
+  }
+
+  async getUser(id: string): Promise<Optional<GUser>> {
+    const user = await this.userDao.getUniqueById(id)
+    return user ? UserAdapter.toGUser(user) : undefined
   }
 }

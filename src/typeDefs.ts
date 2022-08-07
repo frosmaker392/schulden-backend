@@ -1,10 +1,8 @@
 import { NexusGenObjects, NexusGenUnions } from '../nexus-typegen'
 
 // Basic types
-export type ID = string
-
 export interface WithId {
-  id: ID
+  id: string
 }
 
 export interface JWTPayload {

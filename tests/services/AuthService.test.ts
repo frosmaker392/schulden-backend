@@ -1,6 +1,7 @@
 import AuthService from '../../src/services/AuthService'
 import { UserMemoryDao } from '../../src/daos/UserDao'
-import type { GError, GAuthPayload } from '../../src/typeDefs'
+import { GError, GAuthPayload, GUser } from '../../src/typeDefs'
+import { User } from '../../src/models/Person'
 
 const existingUsersToCreate = [
   {
@@ -27,10 +28,13 @@ const validLoginForm = {
 }
 
 let authService: AuthService
+let createdUsers: User[]
 describe('AuthService', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     const userDao = new UserMemoryDao()
-    existingUsersToCreate.map((u) => userDao.create(u))
+    createdUsers = await Promise.all(
+      existingUsersToCreate.map((u) => userDao.create(u))
+    )
 
     authService = new AuthService(userDao, 'secret')
   })
@@ -129,6 +133,24 @@ describe('AuthService', () => {
       })
 
       expectAnyError(result)
+    })
+  })
+
+  describe('getUser', () => {
+    test('returns user if present', async () => {
+      const user = await authService.getUser(createdUsers[0].id)
+
+      expect(user).toEqual<GUser>({
+        id: createdUsers[0].id,
+        username: createdUsers[0].name,
+        email: createdUsers[0].email
+      })
+    })
+
+    test('returns undefined if not present', async () => {
+      const user = await authService.getUser('non-existent-id')
+
+      expect(user).toBeUndefined()
     })
   })
 })

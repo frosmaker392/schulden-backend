@@ -1,19 +1,17 @@
-import { ID } from '../typeDefs'
-
 export interface Person {
-  id: ID
+  id: string
   name: string
 }
 
 export class User implements Person {
   constructor(
-    private _id: ID,
+    private _id: string,
     private _name: string,
     private _email: string,
     private _passwordHash: string
   ) {}
 
-  public get id(): ID {
+  public get id(): string {
     return this._id
   }
 
@@ -31,9 +29,9 @@ export class User implements Person {
 }
 
 export class OfflinePerson implements Person {
-  constructor(private _id: ID, private _name: string) {}
+  constructor(private _id: string, private _name: string) {}
 
-  public get id(): ID {
+  public get id(): string {
     return this._id
   }
 

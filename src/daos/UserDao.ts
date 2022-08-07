@@ -1,7 +1,6 @@
 import * as Neo4J from 'neo4j-driver'
 import { nanoid } from 'nanoid'
 
-import type { ID } from '../typeDefs'
 import { Optional } from '../utils/utilityTypes'
 import Neo4JUtil from '../utils/Neo4JUtil'
 import { User } from '../models/Person'
@@ -9,7 +8,7 @@ import UserAdapter from '../adapters/UserAdapter'
 
 export interface UserDao {
   create(user: Omit<User, 'id'>): Promise<User>
-  getUniqueById(id: ID): Promise<Optional<User>>
+  getUniqueById(id: string): Promise<Optional<User>>
   getUniqueByName(name: string): Promise<Optional<User>>
   getUniqueByEmail(email: string): Promise<Optional<User>>
 }
@@ -25,7 +24,7 @@ export class UserMemoryDao implements UserDao {
     return newUser
   }
 
-  async getUniqueById(id: ID): Promise<Optional<User>> {
+  async getUniqueById(id: string): Promise<Optional<User>> {
     return this.users.find((u) => u.id === id)
   }
 
