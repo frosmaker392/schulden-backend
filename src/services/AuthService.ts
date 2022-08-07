@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
-import { AuthTokenPayload, GAuthResult } from '../typeDefs'
+import { JWTPayload, GAuthResult } from '../typeDefs'
 import { Service } from './Service'
 import UserAdapter from '../adapters/UserAdapter'
 import { UserDao } from '../daos/UserDao'
@@ -26,7 +26,6 @@ export default class AuthService extends Service {
   }
 
   private validator: Validator = new Validator()
-  private userAdapter: UserAdapter = new UserAdapter()
 
   constructor(private userDao: UserDao, private jwtSecret: string) {
     super()
@@ -44,9 +43,10 @@ export default class AuthService extends Service {
         }
     }
 
-    const userExists =
-      (await this.userDao.getManyByNameOrEmail(username, email)).length > 0
-    if (userExists)
+    const existingUserWithEmail = await this.userDao.getUniqueByEmail(email)
+    const existingUserWithName = await this.userDao.getUniqueByName(username)
+
+    if (existingUserWithEmail || existingUserWithName)
       return {
         errorMessage: 'User already exists with this email or username!'
       }
@@ -59,7 +59,7 @@ export default class AuthService extends Service {
       passwordHash
     })
 
-    const authTokenPayload: AuthTokenPayload = {
+    const authTokenPayload: JWTPayload = {
       userId: user.id
     }
     const token = jwt.sign(authTokenPayload, this.jwtSecret)
@@ -74,13 +74,13 @@ export default class AuthService extends Service {
     const loginErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
-    const user = await this.userDao.getUnique('email', email)
+    const user = await this.userDao.getUniqueByEmail(email)
     if (!user) return { errorMessage: loginErrorMsg }
 
     const valid = await bcrypt.compare(password, user.passwordHash)
     if (!valid) return { errorMessage: loginErrorMsg }
 
-    const authTokenPayload: AuthTokenPayload = {
+    const authTokenPayload: JWTPayload = {
       userId: user.id
     }
     const token = jwt.sign(authTokenPayload, this.jwtSecret)

@@ -4,16 +4,14 @@ import { Request } from 'express'
 
 import { UserNeo4JDao } from './daos/UserDao'
 import { envKeys } from './env'
-import AccountService from './services/AccountService'
 import AuthService from './services/AuthService'
 import { EnvObject } from './utils/EnvExtractor'
-import { AuthTokenPayload } from './typeDefs'
+import { JWTPayload } from './typeDefs'
 import { Optional } from './utils/utilityTypes'
 
 export interface Context {
   services: {
     auth: AuthService
-    account: AccountService
   }
   envObject: EnvObject<typeof envKeys>
   userId?: string
@@ -30,18 +28,17 @@ export const createContext =
     // Initialize services
     const userDao = new UserNeo4JDao(neo4jDriver)
     const services = {
-      auth: new AuthService(userDao, envObject.APP_SECRET),
-      account: new AccountService(userDao)
+      auth: new AuthService(userDao, envObject.APP_SECRET)
     }
 
     // Parse JWT token
     const authHeader = req.headers?.authorization?.replace('Bearer ', '')
-    let token: Optional<AuthTokenPayload>
+    let token: Optional<JWTPayload>
     if (authHeader) {
       token = jwt.verify(
         authHeader,
         envObject.APP_SECRET
-      ) as Optional<AuthTokenPayload>
+      ) as Optional<JWTPayload>
     }
 
     return {

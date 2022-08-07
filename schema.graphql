@@ -16,11 +16,10 @@ type Error {
 type Mutation {
   login(email: String!, password: String!): AuthResult!
   register(email: String!, password: String!, username: String!): AuthResult!
-  updateUser(id: String!, password: String, username: String): UserResult!
 }
 
 type Query {
-  user: User
+  ok: Boolean!
 }
 
 type RegisterValidationError {
@@ -34,11 +33,3 @@ type User {
   id: String!
   username: String!
 }
-
-union UserResult = Error | User
-
-type Users {
-  list: [User!]!
-}
-
-union UsersResult = Error | Users

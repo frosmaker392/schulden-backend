@@ -47,9 +47,6 @@ export interface NexusGenObjects {
     id: string; // String!
     username: string; // String!
   }
-  Users: { // root type
-    list: NexusGenRootTypes['User'][]; // [User!]!
-  }
 }
 
 export interface NexusGenInterfaces {
@@ -57,8 +54,6 @@ export interface NexusGenInterfaces {
 
 export interface NexusGenUnions {
   AuthResult: NexusGenRootTypes['AuthPayload'] | NexusGenRootTypes['Error'];
-  UserResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['User'];
-  UsersResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Users'];
 }
 
 export type NexusGenRootTypes = NexusGenObjects & NexusGenUnions
@@ -76,10 +71,9 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     login: NexusGenRootTypes['AuthResult']; // AuthResult!
     register: NexusGenRootTypes['AuthResult']; // AuthResult!
-    updateUser: NexusGenRootTypes['UserResult']; // UserResult!
   }
   Query: { // field return type
-    user: NexusGenRootTypes['User'] | null; // User
+    ok: boolean; // Boolean!
   }
   RegisterValidationError: { // field return type
     emailErrorMessage: string | null; // String
@@ -90,9 +84,6 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     id: string; // String!
     username: string; // String!
-  }
-  Users: { // field return type
-    list: NexusGenRootTypes['User'][]; // [User!]!
   }
 }
 
@@ -107,10 +98,9 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     login: 'AuthResult'
     register: 'AuthResult'
-    updateUser: 'UserResult'
   }
   Query: { // field return type name
-    user: 'User'
+    ok: 'Boolean'
   }
   RegisterValidationError: { // field return type name
     emailErrorMessage: 'String'
@@ -121,9 +111,6 @@ export interface NexusGenFieldTypeNames {
     email: 'String'
     id: 'String'
     username: 'String'
-  }
-  Users: { // field return type name
-    list: 'User'
   }
 }
 
@@ -138,18 +125,11 @@ export interface NexusGenArgTypes {
       password: string; // String!
       username: string; // String!
     }
-    updateUser: { // args
-      id: string; // String!
-      password?: string | null; // String
-      username?: string | null; // String
-    }
   }
 }
 
 export interface NexusGenAbstractTypeMembers {
   AuthResult: "AuthPayload" | "Error"
-  UserResult: "Error" | "User"
-  UsersResult: "Error" | "Users"
 }
 
 export interface NexusGenTypeInterfaces {
@@ -169,7 +149,7 @@ export type NexusGenUnionNames = keyof NexusGenUnions;
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
-export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult" | "UserResult" | "UsersResult";
+export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult";
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

@@ -7,7 +7,7 @@ export interface WithId {
   id: ID
 }
 
-export interface AuthTokenPayload {
+export interface JWTPayload {
   userId: string
 }
 
@@ -22,7 +22,7 @@ export type GAuthPayload = NexusGenObjects['AuthPayload']
 export type GError = NexusGenObjects['Error']
 
 // DB types
-export interface User extends WithId {
+export interface DBUser extends WithId {
   name: string
   email: string
   passwordHash: string

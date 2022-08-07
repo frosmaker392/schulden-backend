@@ -20,7 +20,7 @@ describe('Neo4JUtil', () => {
   test('run read query', async () => {
     const callback = jest.fn(async () => 3)
 
-    const result = await Neo4JUtil.runQuery(neo4jDriver, 'read', callback)
+    const result = await Neo4JUtil.session(neo4jDriver, 'read', callback)
 
     expect(neo4jDriver.session).toHaveBeenCalledWith({
       defaultAccessMode: Neo4J.session.READ
@@ -33,7 +33,7 @@ describe('Neo4JUtil', () => {
   test('run write query', async () => {
     const callback = jest.fn(async () => 5)
 
-    const result = await Neo4JUtil.runQuery(neo4jDriver, 'write', callback)
+    const result = await Neo4JUtil.session(neo4jDriver, 'write', callback)
 
     expect(neo4jDriver.session).toHaveBeenCalledWith({
       defaultAccessMode: Neo4J.session.WRITE
