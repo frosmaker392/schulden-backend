@@ -8,10 +8,23 @@ import { schema } from './schema'
 const neo4jDriver = Neo4J.driver(
   'neo4j://localhost',
   Neo4J.auth.basic(envObject.NEO4J_USERNAME, envObject.NEO4J_PASSWORD)
+  // For logging purposes
+  /* {
+    logging: {
+      level: 'debug',
+      logger: (level, message) => {
+        console[level].call(console, `[${level.toUpperCase()}]: ${message}`)
+      }
+    }
+  } */
 )
+
+// Crude way of verifying db connection, throws error if server is unreachable
+neo4jDriver.supportsMultiDb()
+
 const context = createContext(neo4jDriver, envObject)
 
-export const server = new ApolloServer({
+const server = new ApolloServer({
   schema,
   context
 })

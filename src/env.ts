@@ -26,6 +26,6 @@ const { envObject, warnings } = envExtractor.getEnvVariables(
 )
 
 // Print all warnings for missing env values
-warnings.map(console.warn)
+warnings.map((a) => console.warn(a))
 
 export default envObject

@@ -47,7 +47,12 @@ export class UserNeo4JDao implements UserDao {
       const { records } = await session.run(
         `CREATE (user :User { id: $id, name: $name, email: $email, passwordHash: $passwordHash }) 
         RETURN user`,
-        { id, ...user }
+        {
+          id,
+          name: user.name,
+          email: user.email,
+          passwordHash: user.passwordHash
+        }
       )
 
       const dbUser = records[0].get('user').properties
@@ -71,7 +76,7 @@ export class UserNeo4JDao implements UserDao {
   getUniqueByName(name: string): Promise<Optional<User>> {
     return Neo4JUtil.session(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
-        `MATCH (u :User { name: $id }) RETURN DISTINCT u`,
+        `MATCH (u :User { name: $name }) RETURN DISTINCT u`,
         { name }
       )
 
