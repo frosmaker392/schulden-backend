@@ -17,7 +17,7 @@ export class UserMemoryDao implements UserDao {
   private users: User[] = []
 
   async create(user: Omit<User, 'id'>): Promise<User> {
-    const id = (Math.random() * 1000).toFixed(0)
+    const id = (Math.random() * 10000).toFixed(0)
     const newUser: User = new User(id, user.name, user.email, user.passwordHash)
 
     this.users.push(newUser)
