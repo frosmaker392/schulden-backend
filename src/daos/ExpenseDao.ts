@@ -1,10 +1,17 @@
 import { nanoid } from 'nanoid'
 import * as Neo4J from 'neo4j-driver'
+import UserAdapter from '../adapters/UserAdapter'
 
 import { Debtor } from '../models/Debt'
 import { Expense } from '../models/Expense'
 import { OfflinePerson, Person, User } from '../models/Person'
-import { DBExpense, DBRelShouldPay, DBUser } from '../typeDefs'
+import {
+  DBExpense,
+  DBPerson,
+  DBRelShouldPay,
+  DBUser,
+  Neo4JEntity
+} from '../typeDefs'
 import Neo4JUtil from '../utils/Neo4JUtil'
 import { Optional } from '../utils/utilityTypes'
 import { UserDao } from './UserDao'
@@ -106,7 +113,7 @@ export class ExpenseNeo4JDao implements ExpenseDao {
       // Then link up all debtors with SHOULD_PAY relationships
       const { records: debtorRecords } = await session.run(
         `UNWIND $debtors AS debtor
-        MATCH (p) 
+        MATCH (p:Person) 
         WHERE ((p:User) OR (p:OfflinePerson)-[:BELONGS_TO]->(:User {id: $ownerId}))
         AND p.id = debtor.personId
         WITH p, debtor
@@ -127,12 +134,7 @@ export class ExpenseNeo4JDao implements ExpenseDao {
 
         let person: Person
         if ('email' in debtorPerson) {
-          person = new User(
-            debtorPerson.id,
-            debtorPerson.name,
-            debtorPerson.email,
-            debtorPerson.passwordHash
-          )
+          person = UserAdapter.toUserModel(debtorPerson)
         } else {
           person = new OfflinePerson(debtorPerson.id, debtorPerson.name)
         }
@@ -141,12 +143,7 @@ export class ExpenseNeo4JDao implements ExpenseDao {
       })
       const expense = userExpenseRecords[0].get('e').properties as DBExpense
 
-      const payer: Person = new User(
-        payingUser.id,
-        payingUser.name,
-        payingUser.email,
-        payingUser.passwordHash
-      )
+      const payer = UserAdapter.toUserModel(payingUser)
 
       return new Expense(
         id,
@@ -160,9 +157,64 @@ export class ExpenseNeo4JDao implements ExpenseDao {
   }
 
   getAll(userId: string): Promise<Expense[]> {
-    throw new Error('Method not implemented.')
+    return Neo4JUtil.session(this.neo4jDriver, 'read', async (session) => {
+      const { records } = await session.run(
+        `MATCH (e:Expense)
+        WHERE (e)-[:PAID_BY]->(:User { id: $id }) OR (e)<-[:SHOULD_PAY]-(:User { id: $id })
+        WITH e ORDER BY e.timestamp
+        MATCH (payer:Person)<-[:PAID_BY]-(e)<-[s:SHOULD_PAY]-(d:Person)
+        RETURN DISTINCT e, payer, collect(d) as debtors, collect(s) as shouldPayRels`,
+        {
+          id: userId
+        }
+      )
+
+      const expenses = records.map((r) => {
+        const dbExpense: DBExpense = r.get('e').properties
+        const dbPayer: DBUser = r.get('payer').properties
+
+        const dbDebtors: DBPerson[] = r
+          .get('debtors')
+          .map((d: Neo4JEntity<DBPerson>) => d.properties)
+
+        const dbShouldPayRels: DBRelShouldPay[] = r
+          .get('shouldPayRels')
+          .map((d: Neo4JEntity<DBRelShouldPay>) => d.properties)
+
+        const debtors = dbDebtors.map((d, i) => {
+          const person: Person =
+            'email' in d
+              ? new User(d.id, d.name, d.email, d.passwordHash)
+              : new OfflinePerson(d.id, d.name)
+
+          return new Debtor(person, dbShouldPayRels[i].amount)
+        })
+
+        const payer = UserAdapter.toUserModel(dbPayer)
+        return new Expense(
+          dbExpense.id,
+          dbExpense.name,
+          new Date(dbExpense.timestamp),
+          dbExpense.totalAmount,
+          payer,
+          debtors
+        )
+      })
+
+      return expenses
+    })
   }
+
   deleteById(id: string): Promise<Optional<Expense>> {
-    throw new Error('Method not implemented.')
+    return Neo4JUtil.session(this.neo4jDriver, 'write', async (session) => {
+      const { records } = await session.run(
+        `MATCH (e:Expense { id: $id }) RETURN e`,
+        { id }
+      )
+
+      await session.run(`MATCH (e:Expense { id: $id }) DETACH DELETE e`, { id })
+
+      return records[0].get('e').properties
+    })
   }
 }
