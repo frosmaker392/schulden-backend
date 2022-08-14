@@ -158,6 +158,7 @@ export class ExpenseNeo4JDao implements ExpenseDao {
       )
     })
   }
+
   getAll(userId: string): Promise<Expense[]> {
     throw new Error('Method not implemented.')
   }

@@ -19,8 +19,8 @@ const neo4jDriver = Neo4J.driver(
   } */
 )
 
-// Crude way of verifying db connection, throws error if server is unreachable
-neo4jDriver.supportsMultiDb()
+// Stops the application if no db connection is present
+neo4jDriver.verifyConnectivity()
 
 const context = createContext(neo4jDriver, envObject)
 
@@ -29,11 +29,6 @@ const server = new ApolloServer({
   context
 })
 
-server
-  .listen({ port: parseInt(envObject.PORT) })
-  .then(({ url }) => {
-    console.log(`Server ready at ${url}`)
-  })
-  .finally(() => {
-    neo4jDriver.close()
-  })
+server.listen({ port: parseInt(envObject.PORT) }).then(({ url }) => {
+  console.log(`Server ready at ${url}`)
+})
