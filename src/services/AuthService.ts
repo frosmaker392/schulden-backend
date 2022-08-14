@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
 import { JWTPayload, GAuthResult, GUser } from '../typeDefs'
 import { Service } from './Service'
-import UserAdapter from '../adapters/UserAdapter'
+import PersonAdapter from '../adapters/PersonAdapter'
 import { UserDao } from '../daos/UserDao'
 import { Optional } from '../utils/utilityTypes'
 
@@ -67,7 +67,7 @@ export default class AuthService extends Service {
 
     return {
       token,
-      user: UserAdapter.toGUser(user)
+      user: PersonAdapter.toGUser(user)
     }
   }
 
@@ -88,12 +88,12 @@ export default class AuthService extends Service {
 
     return {
       token,
-      user: UserAdapter.toGUser(user)
+      user: PersonAdapter.toGUser(user)
     }
   }
 
   async getUser(id: string): Promise<Optional<GUser>> {
     const user = await this.userDao.getUniqueById(id)
-    return user ? UserAdapter.toGUser(user) : undefined
+    return user ? PersonAdapter.toGUser(user) : undefined
   }
 }

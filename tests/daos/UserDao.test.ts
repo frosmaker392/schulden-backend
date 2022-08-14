@@ -13,11 +13,6 @@ const usersToCreate: Omit<User, 'id'>[] = [
     passwordHash: 'userB-hash'
   },
   {
-    email: 'userB@test.com',
-    name: 'userB',
-    passwordHash: 'userB-hash'
-  },
-  {
     email: 'userC@test.com',
     name: 'userC',
     passwordHash: 'userC-hash'
@@ -92,6 +87,20 @@ describe('UserMemoryDao', () => {
         const user = await userDao.getUniqueByEmail('non-existent-email')
 
         expect(user).toBeUndefined()
+      })
+    })
+
+    describe('findByName', () => {
+      test('returns users with names containing given name', async () => {
+        const users = await userDao.findByName('user')
+
+        expect(users.length).toBe(3)
+      })
+
+      test('is case sensitive', async () => {
+        const users = await userDao.findByName('User')
+
+        expect(users.length).toBe(0)
       })
     })
   })
