@@ -1,3 +1,5 @@
-export * from './User'
 export * from './Auth'
 export * from './Error'
+export * from './Expense'
+export * from './Person'
+export * from './User'

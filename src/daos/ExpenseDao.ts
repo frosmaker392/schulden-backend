@@ -68,11 +68,23 @@ export class ExpenseMemoryDao implements ExpenseDao {
     return expense
   }
 
-  async getAll(userId: string): Promise<Expense[]> {
-    return this.expenses.filter(
-      (e) =>
-        e.payer.id === userId || e.debtors.some((d) => d.person.id === userId)
-    )
+  async getAll(personId: string, actorId: string): Promise<Expense[]> {
+    return this.expenses.filter((e) => {
+      if (personId === actorId)
+        return (
+          e.payer.id === personId ||
+          e.debtors.some((d) => d.person.id === personId)
+        )
+
+      return (
+        (e.payer.id === actorId &&
+          e.debtors.some((d) => d.person.id === personId)) ||
+        (e.payer.id === personId &&
+          e.debtors.some((d) => d.person.id === actorId)) ||
+        (e.debtors.some((d) => d.person.id === actorId) &&
+          e.debtors.some((d) => d.person.id === personId))
+      )
+    })
   }
 
   async deleteById(id: string): Promise<Optional<Expense>> {
@@ -94,7 +106,7 @@ export class ExpenseNeo4JDao implements ExpenseDao {
 
     return Neo4JUtil.session(this.neo4jDriver, 'write', async (session) => {
       // Create expense and PAID_BY relationship first
-      const { records: userExpenseRecords } = await session.run(
+      const { records: personExpenseRecords } = await session.run(
         `MATCH (p:Person { id: $payerId })
         WHERE (p:User) OR (p:OfflinePerson)-[:BELONGS_TO]->(:User { id: $actorId })
         CREATE (e:Expense $expense)-[:PAID_BY]->(p)
@@ -127,7 +139,8 @@ export class ExpenseNeo4JDao implements ExpenseDao {
         }
       )
 
-      const payingUser = userExpenseRecords[0].get('u').properties as DBUser
+      const payingPerson = personExpenseRecords[0].get('p')
+        .properties as DBPerson
       const debtors = debtorRecords.map((record) => {
         const dbPerson: DBPerson = record.get('p').properties
         const shouldPayRel: DBRelShouldPay = record.get('s').properties
@@ -136,9 +149,9 @@ export class ExpenseNeo4JDao implements ExpenseDao {
 
         return new Debtor(person, shouldPayRel.amount)
       })
-      const expense = userExpenseRecords[0].get('e').properties as DBExpense
+      const expense = personExpenseRecords[0].get('e').properties as DBExpense
 
-      const payer = PersonAdapter.toUserModel(payingUser)
+      const payer = PersonAdapter.toPersonModel(payingPerson)
 
       return new Expense(
         id,
@@ -155,7 +168,8 @@ export class ExpenseNeo4JDao implements ExpenseDao {
     return Neo4JUtil.session(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
         `MATCH (p:Person { id: $personId })
-        WHERE (p:User) OR (p)-[:BELONGS_TO]->(:User { id: actorId })
+        WHERE ($personId = $actorId AND (p:User)) OR (p)-[:BELONGS_TO]->(:User { id: $actorId }) 
+        OR (p:User)--(:Expense)--(:User { id: $actorId })
         WITH p
         MATCH (e:Expense)
         WHERE (e)-[:PAID_BY]->(p) OR (e)<-[:SHOULD_PAY]-(p)

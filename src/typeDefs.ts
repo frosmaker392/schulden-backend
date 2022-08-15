@@ -11,7 +11,14 @@ export interface JWTPayload {
 
 // GraphQL types, derived from nexus-typegen
 export type GUser = NexusGenObjects['User']
+export type GOfflineUser = NexusGenObjects['OfflinePerson']
+export type GPerson = NexusGenUnions['Person']
+
 export type GUserResult = NexusGenUnions['UserResult']
+
+export type GExpense = NexusGenObjects['Expense']
+export type GExpenseResult = NexusGenUnions['ExpenseResult']
+export type GExpensesResult = NexusGenUnions['ExpensesResult']
 
 export type GAuthResult = NexusGenUnions['AuthResult']
 export type GAuthPayload = NexusGenObjects['AuthPayload']

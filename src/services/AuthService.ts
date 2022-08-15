@@ -2,7 +2,6 @@ import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
 import { JWTPayload, GAuthResult, GUser } from '../typeDefs'
-import { Service } from './Service'
 import PersonAdapter from '../adapters/PersonAdapter'
 import { UserDao } from '../daos/UserDao'
 import { Optional } from '../utils/utilityTypes'
@@ -18,7 +17,7 @@ interface LoginForm {
   password: string
 }
 
-export default class AuthService extends Service {
+export default class AuthService {
   private readonly validatorErrors: Record<keyof RegisterForm, string> = {
     email: 'Invalid email address!',
     username: 'Username must contain between 4 and 20 alphanumeric characters.',
@@ -28,9 +27,7 @@ export default class AuthService extends Service {
 
   private validator: Validator = new Validator()
 
-  constructor(private userDao: UserDao, private jwtSecret: string) {
-    super()
-  }
+  constructor(private userDao: UserDao, private jwtSecret: string) {}
 
   async register(registerForm: RegisterForm): Promise<GAuthResult> {
     const { email, username, password } = registerForm

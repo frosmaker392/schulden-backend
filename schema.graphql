@@ -9,17 +9,53 @@ type AuthPayload {
 
 union AuthResult = AuthPayload | Error
 
+type Debtor {
+  amount: Float!
+  person: Person!
+}
+
+input DebtorInputType {
+  amount: Float!
+  personId: String!
+}
+
 type Error {
   errorMessage: String!
 }
 
+type Expense {
+  debtors: [Debtor!]!
+  id: String!
+  name: String!
+  payer: Person!
+  timestamp: String!
+  totalAmount: Float!
+}
+
+union ExpenseResult = Error | Expense
+
+type Expenses {
+  expenses: [Expense!]!
+}
+
+union ExpensesResult = Error | Expenses
+
 type Mutation {
+  createExpense(debtors: [DebtorInputType!]!, name: String!, payerId: String!, totalAmount: Float!): ExpenseResult!
   login(email: String!, password: String!): AuthResult!
   register(email: String!, password: String!, username: String!): AuthResult!
 }
 
+type OfflinePerson {
+  id: String!
+  name: String!
+}
+
+union Person = OfflinePerson | User
+
 type Query {
   currentUser: UserResult
+  getAllExpenses(personId: String!): ExpensesResult!
 }
 
 type RegisterValidationError {

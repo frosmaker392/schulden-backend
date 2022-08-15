@@ -118,6 +118,15 @@ describe('ExpenseMemoryDao', () => {
             { personId: createdUsers[0].id, amount: 5 },
             { personId: createdUsers[1].id, amount: 5 }
           ]
+        },
+        {
+          name: 'Expense 4',
+          totalAmount: 30,
+          payerId: createdUsers[0].id,
+          debtors: [
+            { personId: createdUsers[1].id, amount: 15 },
+            { personId: createdUsers[2].id, amount: 15 }
+          ]
         }
       ]
 
@@ -126,14 +135,42 @@ describe('ExpenseMemoryDao', () => {
       )
     })
 
-    test('getAll - returns all expenses related to user with given id', async () => {
-      const expensesUser0 = await expenseDao.getAll(createdUsers[0].id)
-      const expensesUser1 = await expenseDao.getAll(createdUsers[1].id)
-      const expensesUser2 = await expenseDao.getAll(createdUsers[2].id)
+    describe('getAll', () => {
+      test('returns all expenses for given user if person- and actorIds match', async () => {
+        const expensesUser0 = await expenseDao.getAll(
+          createdUsers[0].id,
+          createdUsers[0].id
+        )
+        const expensesUser1 = await expenseDao.getAll(
+          createdUsers[1].id,
+          createdUsers[1].id
+        )
 
-      expect(expensesUser0).toEqual([createdExpenses[0], createdExpenses[2]])
-      expect(expensesUser1).toEqual(createdExpenses)
-      expect(expensesUser2).toEqual([createdExpenses[1], createdExpenses[2]])
+        expect(expensesUser0).toEqual([
+          createdExpenses[0],
+          createdExpenses[2],
+          createdExpenses[3]
+        ])
+        expect(expensesUser1).toEqual(createdExpenses)
+      })
+
+      test('returns only expenses which have relation to person- and actorIds', async () => {
+        const expenses01 = await expenseDao.getAll(
+          createdUsers[0].id,
+          createdUsers[1].id
+        )
+        const expenses20 = await expenseDao.getAll(
+          createdUsers[2].id,
+          createdUsers[0].id
+        )
+
+        expect(expenses01).toEqual([
+          createdExpenses[0],
+          createdExpenses[2],
+          createdExpenses[3]
+        ])
+        expect(expenses20).toEqual([createdExpenses[2], createdExpenses[3]])
+      })
     })
 
     describe('deleteById', () => {
