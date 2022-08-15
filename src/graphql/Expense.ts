@@ -73,12 +73,21 @@ export const ExpenseQuery = extendType({
   definition(t) {
     t.nonNull.field('getAllExpenses', {
       type: 'ExpensesResult',
+      async resolve(parent, args, context) {
+        return context.services.expense.getAllExpenses(context.userId)
+      }
+    })
+
+    t.nonNull.field('getAllRelatedExpenses', {
+      type: 'ExpensesResult',
       args: {
         personId: nonNull(stringArg())
       },
-
       async resolve(parent, { personId }, context) {
-        return context.services.expense.getAllExpenses(personId, context.userId)
+        return context.services.expense.getAllRelatedExpenses(
+          personId,
+          context.userId
+        )
       }
     })
   }
@@ -95,13 +104,22 @@ export const ExpenseMutation = extendType({
         payerId: nonNull(stringArg()),
         debtors: nonNull(list(nonNull(DebtorInputType)))
       },
-
       async resolve(parent, args, context) {
         const expenseForm: ExpenseForm = args
         return context.services.expense.createExpense(
           expenseForm,
           context.userId
         )
+      }
+    })
+
+    t.nonNull.field('deleteExpense', {
+      type: 'ExpenseResult',
+      args: {
+        expenseId: nonNull(stringArg())
+      },
+      async resolve(parent, { expenseId }, context) {
+        return context.services.expense.deleteExpense(expenseId)
       }
     })
   }

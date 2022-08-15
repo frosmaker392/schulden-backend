@@ -42,6 +42,7 @@ union ExpensesResult = Error | Expenses
 
 type Mutation {
   createExpense(debtors: [DebtorInputType!]!, name: String!, payerId: String!, totalAmount: Float!): ExpenseResult!
+  deleteExpense(expenseId: String!): ExpenseResult!
   login(email: String!, password: String!): AuthResult!
   register(email: String!, password: String!, username: String!): AuthResult!
 }
@@ -55,7 +56,8 @@ union Person = OfflinePerson | User
 
 type Query {
   currentUser: UserResult
-  getAllExpenses(personId: String!): ExpensesResult!
+  getAllExpenses: ExpensesResult!
+  getAllRelatedExpenses(personId: String!): ExpensesResult!
 }
 
 type RegisterValidationError {

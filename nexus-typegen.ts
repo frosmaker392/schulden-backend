@@ -112,6 +112,7 @@ export interface NexusGenFieldTypes {
   }
   Mutation: { // field return type
     createExpense: NexusGenRootTypes['ExpenseResult']; // ExpenseResult!
+    deleteExpense: NexusGenRootTypes['ExpenseResult']; // ExpenseResult!
     login: NexusGenRootTypes['AuthResult']; // AuthResult!
     register: NexusGenRootTypes['AuthResult']; // AuthResult!
   }
@@ -122,6 +123,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     currentUser: NexusGenRootTypes['UserResult'] | null; // UserResult
     getAllExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
+    getAllRelatedExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
   }
   RegisterValidationError: { // field return type
     emailErrorMessage: string | null; // String
@@ -160,6 +162,7 @@ export interface NexusGenFieldTypeNames {
   }
   Mutation: { // field return type name
     createExpense: 'ExpenseResult'
+    deleteExpense: 'ExpenseResult'
     login: 'AuthResult'
     register: 'AuthResult'
   }
@@ -170,6 +173,7 @@ export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     currentUser: 'UserResult'
     getAllExpenses: 'ExpensesResult'
+    getAllRelatedExpenses: 'ExpensesResult'
   }
   RegisterValidationError: { // field return type name
     emailErrorMessage: 'String'
@@ -191,6 +195,9 @@ export interface NexusGenArgTypes {
       payerId: string; // String!
       totalAmount: number; // Float!
     }
+    deleteExpense: { // args
+      expenseId: string; // String!
+    }
     login: { // args
       email: string; // String!
       password: string; // String!
@@ -202,7 +209,7 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
-    getAllExpenses: { // args
+    getAllRelatedExpenses: { // args
       personId: string; // String!
     }
   }
