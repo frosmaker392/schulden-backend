@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import * as Neo4J from 'neo4j-driver'
+import ExpenseAdapter from '../adapters/ExpenseAdapter'
 
-import PersonAdapter from '../adapters/PersonAdapter'
 import { Debtor, Expense, Person } from '../models'
 
 import {
@@ -139,27 +139,21 @@ export class ExpenseNeo4JDao implements ExpenseDao {
         }
       )
 
-      const payingPerson = personExpenseRecords[0].get('p')
-        .properties as DBPerson
-      const debtors = debtorRecords.map((record) => {
-        const dbPerson: DBPerson = record.get('p').properties
-        const shouldPayRel: DBRelShouldPay = record.get('s').properties
+      const expense: DBExpense = personExpenseRecords[0].get('e').properties
+      const payer: DBPerson = personExpenseRecords[0].get('p').properties
 
-        const person = PersonAdapter.toPersonModel(dbPerson)
+      const debtorPersons: DBPerson[] = debtorRecords.map(
+        (r) => r.get('p').properties
+      )
+      const shouldPayRels: DBRelShouldPay[] = debtorRecords.map(
+        (r) => r.get('s').properties
+      )
 
-        return new Debtor(person, shouldPayRel.amount)
-      })
-      const expense = personExpenseRecords[0].get('e').properties as DBExpense
-
-      const payer = PersonAdapter.toPersonModel(payingPerson)
-
-      return new Expense(
-        id,
-        expense.name,
-        timestamp,
-        expense.totalAmount,
+      return ExpenseAdapter.toExpenseModel(
+        expense,
         payer,
-        debtors
+        debtorPersons,
+        shouldPayRels
       )
     })
   }
@@ -183,31 +177,22 @@ export class ExpenseNeo4JDao implements ExpenseDao {
       )
 
       const expenses = records.map((r) => {
-        const dbExpense: DBExpense = r.get('e').properties
-        const dbPayer: DBUser = r.get('payer').properties
+        const expense: DBExpense = r.get('e').properties
+        const payer: DBUser = r.get('payer').properties
 
-        const dbDebtors: DBPerson[] = r
+        const debtorPersons: DBPerson[] = r
           .get('debtors')
           .map((d: Neo4JEntity<DBPerson>) => d.properties)
 
-        const dbShouldPayRels: DBRelShouldPay[] = r
+        const shouldPayRels: DBRelShouldPay[] = r
           .get('shouldPayRels')
           .map((d: Neo4JEntity<DBRelShouldPay>) => d.properties)
 
-        const debtors = dbDebtors.map((d, i) => {
-          const person: Person = PersonAdapter.toPersonModel(d)
-
-          return new Debtor(person, dbShouldPayRels[i].amount)
-        })
-
-        const payer = PersonAdapter.toUserModel(dbPayer)
-        return new Expense(
-          dbExpense.id,
-          dbExpense.name,
-          new Date(dbExpense.timestamp),
-          dbExpense.totalAmount,
+        return ExpenseAdapter.toExpenseModel(
+          expense,
           payer,
-          debtors
+          debtorPersons,
+          shouldPayRels
         )
       })
 

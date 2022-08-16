@@ -1,5 +1,4 @@
 import ExpenseAdapter from '../adapters/ExpenseAdapter'
-import PersonAdapter from '../adapters/PersonAdapter'
 import { ExpenseDao, ExpenseForm } from '../daos/ExpenseDao'
 import { OfflinePersonDao } from '../daos/OfflinePersonDao'
 import { UserDao } from '../daos/UserDao'
@@ -35,17 +34,7 @@ export default class ExpenseService {
 
     const createdExpense = await this.expenseDao.create(expenseForm, actorId)
 
-    return {
-      id: createdExpense.id,
-      name: createdExpense.name,
-      timestamp: createdExpense.timestamp.toISOString(),
-      totalAmount: createdExpense.totalAmount,
-      payer: PersonAdapter.toGPerson(createdExpense.payer),
-      debtors: createdExpense.debtors.map(({ person, amount }) => ({
-        person: PersonAdapter.toGPerson(person),
-        amount
-      }))
-    }
+    return ExpenseAdapter.toGExpense(createdExpense)
   }
 
   async getAllExpenses(userId?: string): Promise<GExpensesResult> {
