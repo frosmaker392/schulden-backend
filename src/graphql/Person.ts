@@ -1,14 +1,6 @@
-import { objectType, unionType } from 'nexus'
+import { interfaceType, objectType } from 'nexus'
 
-export const OfflinePerson = objectType({
-  name: 'OfflinePerson',
-  definition(t) {
-    t.nonNull.string('id')
-    t.nonNull.string('name')
-  }
-})
-
-export const Person = unionType({
+export const Person = interfaceType({
   name: 'Person',
   resolveType(data) {
     const __typename = 'email' in data ? 'User' : 'OfflinePerson'
@@ -16,6 +8,14 @@ export const Person = unionType({
     return __typename
   },
   definition(t) {
-    t.members('User', 'OfflinePerson')
+    t.nonNull.id('id')
+    t.nonNull.string('name')
+  }
+})
+
+export const OfflinePerson = objectType({
+  name: 'OfflinePerson',
+  definition(t) {
+    t.implements('Person')
   }
 })

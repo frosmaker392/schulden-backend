@@ -51,7 +51,7 @@ describe('AuthService', () => {
         user: {
           id: expect.any(String),
           email: 'user3@test.com',
-          username: 'user3'
+          name: 'user3'
         }
       })
     })
@@ -114,7 +114,7 @@ describe('AuthService', () => {
         user: {
           id: expect.any(String),
           email: 'user3@test.com',
-          username: 'user3'
+          name: 'user3'
         }
       })
     })
@@ -142,7 +142,7 @@ describe('AuthService', () => {
 
       expect(user).toEqual<GUser>({
         id: createdUsers[0].id,
-        username: createdUsers[0].name,
+        name: createdUsers[0].name,
         email: createdUsers[0].email
       })
     })

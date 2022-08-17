@@ -3,9 +3,8 @@ import { extendType, objectType, unionType } from 'nexus'
 export const User = objectType({
   name: 'User',
   definition(t) {
-    t.nonNull.string('id')
+    t.implements('Person')
     t.nonNull.string('email')
-    t.nonNull.string('username')
   }
 })
 

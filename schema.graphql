@@ -47,12 +47,15 @@ type Mutation {
   register(email: String!, password: String!, username: String!): AuthResult!
 }
 
-type OfflinePerson {
-  id: String!
+type OfflinePerson implements Person {
+  id: ID!
   name: String!
 }
 
-union Person = OfflinePerson | User
+interface Person {
+  id: ID!
+  name: String!
+}
 
 type Query {
   currentUser: UserResult
@@ -66,10 +69,10 @@ type RegisterValidationError {
   usernameErrorMessage: String
 }
 
-type User {
+type User implements Person {
   email: String!
-  id: String!
-  username: String!
+  id: ID!
+  name: String!
 }
 
 union UserResult = Error | User

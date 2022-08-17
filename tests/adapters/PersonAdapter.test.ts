@@ -18,10 +18,12 @@ describe('PersonAdapter', () => {
       'test-user-hash'
     )
 
+    const { id, name, email } = user
+
     expect(PersonAdapter.toGUser(user)).toEqual<GUser>({
-      id: user.id,
-      username: user.name,
-      email: user.email
+      id,
+      name,
+      email
     })
   })
 

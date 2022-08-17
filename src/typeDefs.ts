@@ -1,10 +1,10 @@
-import { NexusGenObjects, NexusGenUnions } from '../nexus-typegen'
+import {
+  NexusGenInterfaces,
+  NexusGenObjects,
+  NexusGenUnions
+} from '../nexus-typegen'
 
 // Basic types
-export interface WithId {
-  id: string
-}
-
 export interface JWTPayload {
   userId: string
 }
@@ -12,7 +12,7 @@ export interface JWTPayload {
 // GraphQL types, derived from nexus-typegen
 export type GUser = NexusGenObjects['User']
 export type GOfflineUser = NexusGenObjects['OfflinePerson']
-export type GPerson = NexusGenUnions['Person']
+export type GPerson = NexusGenInterfaces['Person']
 
 export type GUserResult = NexusGenUnions['UserResult']
 
@@ -28,19 +28,21 @@ export type GError = NexusGenObjects['Error']
 export interface Neo4JEntity<T> {
   properties: T
 }
-export interface DBUser extends WithId {
+export interface DBOfflinePerson {
+  id: string
+  name: string
+}
+export interface DBUser {
+  id: string
   name: string
   email: string
   passwordHash: string
 }
 
-export interface DBOfflinePerson extends WithId {
-  name: string
-}
-
 export type DBPerson = DBUser | DBOfflinePerson
 
-export interface DBExpense extends WithId {
+export interface DBExpense {
+  id: string
   name: string
   timestamp: string
   totalAmount: number

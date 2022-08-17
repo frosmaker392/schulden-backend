@@ -3,20 +3,23 @@ import { DBPerson, DBUser, GPerson, GUser } from '../typeDefs'
 
 export default class PersonAdapter {
   static toGUser(from: User): GUser {
+    const { id, name, email } = from
     return {
-      id: from.id,
-      email: from.email,
-      username: from.name
+      id,
+      name,
+      email
     }
   }
 
   static toGPerson(from: Person): GPerson {
-    if (from instanceof User)
+    if (from instanceof User) {
+      const { id, name, email } = from
       return {
-        id: from.id,
-        email: from.email,
-        username: from.name
+        id,
+        name,
+        email
       }
+    }
 
     return {
       id: from.id,
@@ -25,7 +28,8 @@ export default class PersonAdapter {
   }
 
   static toUserModel(from: DBUser): User {
-    return new User(from.id, from.name, from.email, from.passwordHash)
+    const { id, name, email, passwordHash } = from
+    return new User(id, name, email, passwordHash)
   }
 
   static toPersonModel(from: DBPerson): Person {

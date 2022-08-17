@@ -79,7 +79,7 @@ describe('ExpenseAdapter', () => {
       totalAmount: 103,
       payer: {
         id: 'user-id',
-        username: 'user-name',
+        name: 'user-name',
         email: 'user-email'
       },
       debtors: [

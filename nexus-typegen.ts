@@ -56,7 +56,7 @@ export interface NexusGenObjects {
   }
   Mutation: {};
   OfflinePerson: { // root type
-    id: string; // String!
+    id: string; // ID!
     name: string; // String!
   }
   Query: {};
@@ -67,23 +67,23 @@ export interface NexusGenObjects {
   }
   User: { // root type
     email: string; // String!
-    id: string; // String!
-    username: string; // String!
+    id: string; // ID!
+    name: string; // String!
   }
 }
 
 export interface NexusGenInterfaces {
+  Person: NexusGenRootTypes['OfflinePerson'] | NexusGenRootTypes['User'];
 }
 
 export interface NexusGenUnions {
   AuthResult: NexusGenRootTypes['AuthPayload'] | NexusGenRootTypes['Error'];
   ExpenseResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Expense'];
   ExpensesResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Expenses'];
-  Person: NexusGenRootTypes['OfflinePerson'] | NexusGenRootTypes['User'];
   UserResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['User'];
 }
 
-export type NexusGenRootTypes = NexusGenObjects & NexusGenUnions
+export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects & NexusGenUnions
 
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
@@ -117,7 +117,7 @@ export interface NexusGenFieldTypes {
     register: NexusGenRootTypes['AuthResult']; // AuthResult!
   }
   OfflinePerson: { // field return type
-    id: string; // String!
+    id: string; // ID!
     name: string; // String!
   }
   Query: { // field return type
@@ -132,8 +132,12 @@ export interface NexusGenFieldTypes {
   }
   User: { // field return type
     email: string; // String!
-    id: string; // String!
-    username: string; // String!
+    id: string; // ID!
+    name: string; // String!
+  }
+  Person: { // field return type
+    id: string; // ID!
+    name: string; // String!
   }
 }
 
@@ -167,7 +171,7 @@ export interface NexusGenFieldTypeNames {
     register: 'AuthResult'
   }
   OfflinePerson: { // field return type name
-    id: 'String'
+    id: 'ID'
     name: 'String'
   }
   Query: { // field return type name
@@ -182,8 +186,12 @@ export interface NexusGenFieldTypeNames {
   }
   User: { // field return type name
     email: 'String'
-    id: 'String'
-    username: 'String'
+    id: 'ID'
+    name: 'String'
+  }
+  Person: { // field return type name
+    id: 'ID'
+    name: 'String'
   }
 }
 
@@ -219,11 +227,13 @@ export interface NexusGenAbstractTypeMembers {
   AuthResult: "AuthPayload" | "Error"
   ExpenseResult: "Error" | "Expense"
   ExpensesResult: "Error" | "Expenses"
-  Person: "OfflinePerson" | "User"
   UserResult: "Error" | "User"
+  Person: "OfflinePerson" | "User"
 }
 
 export interface NexusGenTypeInterfaces {
+  OfflinePerson: "Person"
+  User: "Person"
 }
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
@@ -232,7 +242,7 @@ export type NexusGenInputNames = keyof NexusGenInputs;
 
 export type NexusGenEnumNames = never;
 
-export type NexusGenInterfaceNames = never;
+export type NexusGenInterfaceNames = keyof NexusGenInterfaces;
 
 export type NexusGenScalarNames = keyof NexusGenScalars;
 
