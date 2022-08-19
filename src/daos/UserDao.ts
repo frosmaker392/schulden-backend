@@ -51,7 +51,7 @@ export class UserNeo4JDao implements UserDao {
 
     return Neo4JUtil.session(this.neo4jDriver, 'write', async (session) => {
       const { records } = await session.run(
-        `CREATE (u:User $userParams) 
+        `CREATE (u:Person:User $userParams) 
         RETURN u`,
         {
           userParams: {
@@ -63,7 +63,7 @@ export class UserNeo4JDao implements UserDao {
         }
       )
 
-      const dbUser = records[0].get('user').properties
+      const dbUser = records[0].get('u').properties
       return PersonAdapter.toUserModel(dbUser)
     })
   }
