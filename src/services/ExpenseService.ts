@@ -2,7 +2,7 @@ import ExpenseAdapter from '../adapters/ExpenseAdapter'
 import { ExpenseDao, ExpenseForm } from '../daos/ExpenseDao'
 import { OfflinePersonDao } from '../daos/OfflinePersonDao'
 import { UserDao } from '../daos/UserDao'
-import { GExpenseResult, GExpensesResult } from '../typeDefs'
+import { GExpenseResult, GExpensesResult, GPersonsResult } from '../typeDefs'
 
 export default class ExpenseService {
   constructor(
@@ -69,5 +69,19 @@ export default class ExpenseService {
       return { errorMessage: `Unable to delete expense with ID ${expenseId}` }
 
     return ExpenseAdapter.toGExpense(deletedExpense)
+  }
+
+  async findPersons(name: string, actorId?: string): Promise<GPersonsResult> {
+    if (!actorId) return { errorMessage: 'Unauthorized!' }
+
+    const users = name.length ? await this.userDao.findByName(name) : []
+    const offlinePersons = await this.offlinePersonDao.getAll(actorId)
+
+    return {
+      persons: [
+        ...users,
+        ...offlinePersons.filter((p) => p.name.match(new RegExp(name)))
+      ]
+    }
   }
 }

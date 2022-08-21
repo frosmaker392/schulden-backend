@@ -15,6 +15,7 @@ export type GOfflineUser = NexusGenObjects['OfflinePerson']
 export type GPerson = NexusGenInterfaces['Person']
 
 export type GUserResult = NexusGenUnions['UserResult']
+export type GPersonsResult = NexusGenUnions['PersonsResult']
 
 export type GExpense = NexusGenObjects['Expense']
 export type GExpenseResult = NexusGenUnions['ExpenseResult']

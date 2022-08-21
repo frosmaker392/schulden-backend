@@ -59,6 +59,9 @@ export interface NexusGenObjects {
     id: string; // ID!
     name: string; // String!
   }
+  Persons: { // root type
+    persons: NexusGenRootTypes['Person'][]; // [Person!]!
+  }
   Query: {};
   RegisterValidationError: { // root type
     emailErrorMessage?: string | null; // String
@@ -80,6 +83,7 @@ export interface NexusGenUnions {
   AuthResult: NexusGenRootTypes['AuthPayload'] | NexusGenRootTypes['Error'];
   ExpenseResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Expense'];
   ExpensesResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Expenses'];
+  PersonsResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Persons'];
   UserResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['User'];
 }
 
@@ -120,8 +124,12 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     name: string; // String!
   }
+  Persons: { // field return type
+    persons: NexusGenRootTypes['Person'][]; // [Person!]!
+  }
   Query: { // field return type
     currentUser: NexusGenRootTypes['UserResult'] | null; // UserResult
+    findPersons: NexusGenRootTypes['PersonsResult']; // PersonsResult!
     getAllExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
     getAllRelatedExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
   }
@@ -174,8 +182,12 @@ export interface NexusGenFieldTypeNames {
     id: 'ID'
     name: 'String'
   }
+  Persons: { // field return type name
+    persons: 'Person'
+  }
   Query: { // field return type name
     currentUser: 'UserResult'
+    findPersons: 'PersonsResult'
     getAllExpenses: 'ExpensesResult'
     getAllRelatedExpenses: 'ExpensesResult'
   }
@@ -217,6 +229,9 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    findPersons: { // args
+      name: string; // String!
+    }
     getAllRelatedExpenses: { // args
       personId: string; // String!
     }
@@ -227,6 +242,7 @@ export interface NexusGenAbstractTypeMembers {
   AuthResult: "AuthPayload" | "Error"
   ExpenseResult: "Error" | "Expense"
   ExpensesResult: "Error" | "Expenses"
+  PersonsResult: "Error" | "Persons"
   UserResult: "Error" | "User"
   Person: "OfflinePerson" | "User"
 }
@@ -250,7 +266,7 @@ export type NexusGenUnionNames = keyof NexusGenUnions;
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
-export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult" | "ExpenseResult" | "ExpensesResult" | "Person" | "UserResult";
+export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult" | "ExpenseResult" | "ExpensesResult" | "Person" | "PersonsResult" | "UserResult";
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

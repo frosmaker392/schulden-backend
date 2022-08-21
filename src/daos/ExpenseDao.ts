@@ -167,7 +167,7 @@ export class ExpenseNeo4JDao implements ExpenseDao {
         WITH p
         MATCH (e:Expense)
         WHERE (e)-[:PAID_BY]->(p) OR (e)<-[:SHOULD_PAY]-(p)
-        WITH e ORDER BY e.timestamp
+        WITH e ORDER BY e.timestamp DESC
         MATCH (payer:Person)<-[:PAID_BY]-(e)<-[s:SHOULD_PAY]-(d:Person)
         RETURN DISTINCT e, payer, collect(d) as debtors, collect(s) as shouldPayRels`,
         {

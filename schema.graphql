@@ -57,8 +57,15 @@ interface Person {
   name: String!
 }
 
+type Persons {
+  persons: [Person!]!
+}
+
+union PersonsResult = Error | Persons
+
 type Query {
   currentUser: UserResult
+  findPersons(name: String!): PersonsResult!
   getAllExpenses: ExpensesResult!
   getAllRelatedExpenses(personId: String!): ExpensesResult!
 }

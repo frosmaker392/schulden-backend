@@ -73,7 +73,8 @@ export class OfflinePersonNeo4JDao implements OfflinePersonDao {
     return Neo4JUtil.session(this.neo4jDriver, 'write', async (session) => {
       const { records } = await session.run(
         `MATCH (o:OfflinePerson)-[:BELONGS_TO]->(:User { id: $ownerId })
-        RETURN o`,
+        RETURN o
+        ORDER BY o.name`,
         { ownerId }
       )
 
