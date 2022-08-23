@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid'
 import * as Neo4J from 'neo4j-driver'
 import ExpenseAdapter from '../adapters/ExpenseAdapter'
 
-import { Debtor, Expense, Person } from '../models'
+import { Expense } from '../models'
 
 import {
   DBExpense,
@@ -13,7 +13,6 @@ import {
 } from '../typeDefs'
 import Neo4JUtil from '../utils/Neo4JUtil'
 import { Optional } from '../utils/utilityTypes'
-import { UserDao } from './UserDao'
 
 export interface ExpenseForm {
   name: string
@@ -25,79 +24,7 @@ export interface ExpenseForm {
   }[]
 }
 
-export interface ExpenseDao {
-  create(expenseForm: ExpenseForm, actorId: string): Promise<Expense>
-  getAll(personId: string, actorId: string): Promise<Expense[]>
-  deleteById(id: string): Promise<Optional<Expense>>
-}
-
-export class ExpenseMemoryDao implements ExpenseDao {
-  private expenses: Expense[] = []
-  constructor(private userDao: UserDao) {}
-
-  async create(expenseForm: ExpenseForm): Promise<Expense> {
-    const { name, totalAmount, payerId } = expenseForm
-    const id = (Math.random() * 10000).toFixed(0)
-
-    const debtors: Debtor[] = await Promise.all(
-      expenseForm.debtors.map(async ({ personId, amount }) => {
-        const user = await this.userDao.getUniqueById(personId)
-
-        if (!user) throw new Error(`Cannot find user with id ${personId}`)
-        return new Debtor(user, amount)
-      })
-    )
-
-    const payer: Person = await this.userDao
-      .getUniqueById(payerId)
-      .then((u) => {
-        if (!u) throw new Error(`Cannot find user with id ${payerId}`)
-        return u
-      })
-
-    const expense = new Expense(
-      id,
-      name,
-      new Date(),
-      totalAmount,
-      payer,
-      debtors
-    )
-
-    this.expenses.push(expense)
-    return expense
-  }
-
-  async getAll(personId: string, actorId: string): Promise<Expense[]> {
-    return this.expenses.filter((e) => {
-      if (personId === actorId)
-        return (
-          e.payer.id === personId ||
-          e.debtors.some((d) => d.person.id === personId)
-        )
-
-      return (
-        (e.payer.id === actorId &&
-          e.debtors.some((d) => d.person.id === personId)) ||
-        (e.payer.id === personId &&
-          e.debtors.some((d) => d.person.id === actorId)) ||
-        (e.debtors.some((d) => d.person.id === actorId) &&
-          e.debtors.some((d) => d.person.id === personId))
-      )
-    })
-  }
-
-  async deleteById(id: string): Promise<Optional<Expense>> {
-    const indexToDelete = this.expenses.findIndex((e) => e.id === id)
-    if (indexToDelete < 0) return undefined
-    const toDelete = this.expenses[indexToDelete]
-
-    this.expenses.splice(indexToDelete, 1)
-    return toDelete
-  }
-}
-
-export class ExpenseNeo4JDao implements ExpenseDao {
+export class ExpenseDao {
   constructor(private neo4jDriver: Neo4J.Driver) {}
 
   create(expenseForm: ExpenseForm, actorId: string): Promise<Expense> {

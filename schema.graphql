@@ -9,6 +9,13 @@ type AuthPayload {
 
 union AuthResult = AuthPayload | Error
 
+type DebtSummary {
+  topDebtors: [Debtor!]!
+  totalAmount: Float!
+}
+
+union DebtSummaryResult = DebtSummary | Error
+
 type Debtor {
   amount: Float!
   person: Person!
@@ -18,6 +25,12 @@ input DebtorInputType {
   amount: Float!
   personId: String!
 }
+
+type Debtors {
+  debtors: [Debtor!]!
+}
+
+union DebtorsResult = Debtors | Error
 
 type Error {
   errorMessage: String!
@@ -66,8 +79,10 @@ union PersonsResult = Error | Persons
 type Query {
   currentUser: UserResult
   findPersons(name: String!): PersonsResult!
+  getAllDebts: DebtorsResult!
   getAllExpenses: ExpensesResult!
   getAllRelatedExpenses(personId: String!): ExpensesResult!
+  getDebtSummary: DebtSummaryResult!
 }
 
 type RegisterValidationError {

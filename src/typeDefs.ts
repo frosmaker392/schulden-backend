@@ -21,6 +21,10 @@ export type GExpense = NexusGenObjects['Expense']
 export type GExpenseResult = NexusGenUnions['ExpenseResult']
 export type GExpensesResult = NexusGenUnions['ExpensesResult']
 
+export type GDebtor = NexusGenObjects['Debtor']
+export type GDebtorsResult = NexusGenUnions['DebtorsResult']
+export type GDebtSummaryResult = NexusGenUnions['DebtSummaryResult']
+
 export type GAuthResult = NexusGenUnions['AuthResult']
 export type GAuthPayload = NexusGenObjects['AuthPayload']
 export type GError = NexusGenObjects['Error']

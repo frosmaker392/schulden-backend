@@ -36,9 +36,16 @@ export interface NexusGenObjects {
     token: string; // String!
     user: NexusGenRootTypes['User']; // User!
   }
+  DebtSummary: { // root type
+    topDebtors: NexusGenRootTypes['Debtor'][]; // [Debtor!]!
+    totalAmount: number; // Float!
+  }
   Debtor: { // root type
     amount: number; // Float!
     person: NexusGenRootTypes['Person']; // Person!
+  }
+  Debtors: { // root type
+    debtors: NexusGenRootTypes['Debtor'][]; // [Debtor!]!
   }
   Error: { // root type
     errorMessage: string; // String!
@@ -81,6 +88,8 @@ export interface NexusGenInterfaces {
 
 export interface NexusGenUnions {
   AuthResult: NexusGenRootTypes['AuthPayload'] | NexusGenRootTypes['Error'];
+  DebtSummaryResult: NexusGenRootTypes['DebtSummary'] | NexusGenRootTypes['Error'];
+  DebtorsResult: NexusGenRootTypes['Debtors'] | NexusGenRootTypes['Error'];
   ExpenseResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Expense'];
   ExpensesResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Expenses'];
   PersonsResult: NexusGenRootTypes['Error'] | NexusGenRootTypes['Persons'];
@@ -96,9 +105,16 @@ export interface NexusGenFieldTypes {
     token: string; // String!
     user: NexusGenRootTypes['User']; // User!
   }
+  DebtSummary: { // field return type
+    topDebtors: NexusGenRootTypes['Debtor'][]; // [Debtor!]!
+    totalAmount: number; // Float!
+  }
   Debtor: { // field return type
     amount: number; // Float!
     person: NexusGenRootTypes['Person']; // Person!
+  }
+  Debtors: { // field return type
+    debtors: NexusGenRootTypes['Debtor'][]; // [Debtor!]!
   }
   Error: { // field return type
     errorMessage: string; // String!
@@ -130,8 +146,10 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     currentUser: NexusGenRootTypes['UserResult'] | null; // UserResult
     findPersons: NexusGenRootTypes['PersonsResult']; // PersonsResult!
+    getAllDebts: NexusGenRootTypes['DebtorsResult']; // DebtorsResult!
     getAllExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
     getAllRelatedExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
+    getDebtSummary: NexusGenRootTypes['DebtSummaryResult']; // DebtSummaryResult!
   }
   RegisterValidationError: { // field return type
     emailErrorMessage: string | null; // String
@@ -154,9 +172,16 @@ export interface NexusGenFieldTypeNames {
     token: 'String'
     user: 'User'
   }
+  DebtSummary: { // field return type name
+    topDebtors: 'Debtor'
+    totalAmount: 'Float'
+  }
   Debtor: { // field return type name
     amount: 'Float'
     person: 'Person'
+  }
+  Debtors: { // field return type name
+    debtors: 'Debtor'
   }
   Error: { // field return type name
     errorMessage: 'String'
@@ -188,8 +213,10 @@ export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     currentUser: 'UserResult'
     findPersons: 'PersonsResult'
+    getAllDebts: 'DebtorsResult'
     getAllExpenses: 'ExpensesResult'
     getAllRelatedExpenses: 'ExpensesResult'
+    getDebtSummary: 'DebtSummaryResult'
   }
   RegisterValidationError: { // field return type name
     emailErrorMessage: 'String'
@@ -240,6 +267,8 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {
   AuthResult: "AuthPayload" | "Error"
+  DebtSummaryResult: "DebtSummary" | "Error"
+  DebtorsResult: "Debtors" | "Error"
   ExpenseResult: "Error" | "Expense"
   ExpensesResult: "Error" | "Expenses"
   PersonsResult: "Error" | "Persons"
@@ -266,7 +295,7 @@ export type NexusGenUnionNames = keyof NexusGenUnions;
 
 export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
 
-export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult" | "ExpenseResult" | "ExpensesResult" | "Person" | "PersonsResult" | "UserResult";
+export type NexusGenAbstractsUsingStrategyResolveType = "AuthResult" | "DebtSummaryResult" | "DebtorsResult" | "ExpenseResult" | "ExpensesResult" | "Person" | "PersonsResult" | "UserResult";
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

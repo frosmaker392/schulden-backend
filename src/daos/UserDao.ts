@@ -7,43 +7,7 @@ import { User } from '../models/Person'
 import PersonAdapter from '../adapters/PersonAdapter'
 import { DBUser } from '../typeDefs'
 
-export interface UserDao {
-  create(user: Omit<User, 'id'>): Promise<User>
-  getUniqueById(id: string): Promise<Optional<User>>
-  getUniqueByName(name: string): Promise<Optional<User>>
-  getUniqueByEmail(email: string): Promise<Optional<User>>
-  findByName(name: string): Promise<User[]>
-}
-
-export class UserMemoryDao implements UserDao {
-  private users: User[] = []
-
-  async create(user: Omit<User, 'id'>): Promise<User> {
-    const id = (Math.random() * 10000).toFixed(0)
-    const newUser: User = new User(id, user.name, user.email, user.passwordHash)
-
-    this.users.push(newUser)
-    return newUser
-  }
-
-  async getUniqueById(id: string): Promise<Optional<User>> {
-    return this.users.find((u) => u.id === id)
-  }
-
-  async getUniqueByName(name: string): Promise<Optional<User>> {
-    return this.users.find((u) => u.name === name)
-  }
-
-  async getUniqueByEmail(email: string): Promise<Optional<User>> {
-    return this.users.find((u) => u.email === email)
-  }
-
-  async findByName(name: string): Promise<User[]> {
-    return this.users.filter((u) => u.name.match(new RegExp(name)))
-  }
-}
-
-export class UserNeo4JDao implements UserDao {
+export class UserDao {
   constructor(private neo4jDriver: Neo4J.Driver) {}
 
   create(user: Omit<User, 'id'>): Promise<User> {

@@ -10,14 +10,6 @@ import {
 } from 'nexus'
 import { ExpenseForm } from '../daos/ExpenseDao'
 
-export const Debtor = objectType({
-  name: 'Debtor',
-  definition(t) {
-    t.nonNull.field('person', { type: 'Person' })
-    t.nonNull.float('amount')
-  }
-})
-
 export const Expense = objectType({
   name: 'Expense',
   definition(t) {
