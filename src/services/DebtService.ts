@@ -8,7 +8,7 @@ export default class DebtService {
   async getAllDebts(actorId?: string): Promise<GDebtorsResult> {
     if (!actorId) return { errorMessage: 'Unauthorized!' }
 
-    const debts = await this.debtDao.getAllForUser(actorId)
+    const debts = await this.debtDao.getAll(actorId)
     return {
       debtors: debts.map((d) => ({
         person: PersonAdapter.toGPerson(d.person),
@@ -20,7 +20,7 @@ export default class DebtService {
   async getDebtSummary(actorId?: string): Promise<GDebtSummaryResult> {
     if (!actorId) return { errorMessage: 'Unauthorized!' }
 
-    const debts = await this.debtDao.getAllForUser(actorId)
+    const debts = await this.debtDao.getAll(actorId)
     const totalAmount = debts.reduce((acc, d) => acc + d.amount, 0)
     return {
       totalAmount,
