@@ -150,6 +150,7 @@ export interface NexusGenFieldTypes {
     getAllExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
     getAllRelatedExpenses: NexusGenRootTypes['ExpensesResult']; // ExpensesResult!
     getDebtSummary: NexusGenRootTypes['DebtSummaryResult']; // DebtSummaryResult!
+    getExpense: NexusGenRootTypes['ExpenseResult']; // ExpenseResult!
   }
   RegisterValidationError: { // field return type
     emailErrorMessage: string | null; // String
@@ -217,6 +218,7 @@ export interface NexusGenFieldTypeNames {
     getAllExpenses: 'ExpensesResult'
     getAllRelatedExpenses: 'ExpensesResult'
     getDebtSummary: 'DebtSummaryResult'
+    getExpense: 'ExpenseResult'
   }
   RegisterValidationError: { // field return type name
     emailErrorMessage: 'String'
@@ -261,6 +263,9 @@ export interface NexusGenArgTypes {
     }
     getAllRelatedExpenses: { // args
       personId: string; // String!
+    }
+    getExpense: { // args
+      expenseId: string; // String!
     }
   }
 }

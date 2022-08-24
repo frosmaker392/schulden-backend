@@ -58,15 +58,31 @@ export default class ExpenseService {
     }
   }
 
-  async deleteExpense(
+  async getExpenseById(
     expenseId: string,
     actorId?: string
   ): Promise<GExpenseResult> {
     if (!actorId) return { errorMessage: 'Unauthorized!' }
 
-    const deletedExpense = await this.expenseDao.deleteById(expenseId)
+    const expense = await this.expenseDao.getById(expenseId, actorId)
+    if (!expense)
+      return { errorMessage: `Expense with ID "${expenseId}" not found!` }
+
+    return ExpenseAdapter.toGExpense(expense)
+  }
+
+  async deleteExpense(
+    expenseId: string,
+    actorId?: string
+  ): Promise<GExpenseResult> {
+    console.log(actorId)
+    if (!actorId) return { errorMessage: 'Unauthorized!' }
+
+    const deletedExpense = await this.expenseDao.deleteById(expenseId, actorId)
     if (!deletedExpense)
-      return { errorMessage: `Unable to delete expense with ID ${expenseId}` }
+      return {
+        errorMessage: `Unable to delete expense with ID "${expenseId}"!`
+      }
 
     return ExpenseAdapter.toGExpense(deletedExpense)
   }

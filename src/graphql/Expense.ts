@@ -82,6 +82,19 @@ export const ExpenseQuery = extendType({
         )
       }
     })
+
+    t.nonNull.field('getExpense', {
+      type: 'ExpenseResult',
+      args: {
+        expenseId: nonNull(stringArg())
+      },
+      async resolve(parent, { expenseId }, context) {
+        return context.services.expense.getExpenseById(
+          expenseId,
+          context.userId
+        )
+      }
+    })
   }
 })
 
@@ -111,7 +124,7 @@ export const ExpenseMutation = extendType({
         expenseId: nonNull(stringArg())
       },
       async resolve(parent, { expenseId }, context) {
-        return context.services.expense.deleteExpense(expenseId)
+        return context.services.expense.deleteExpense(expenseId, context.userId)
       }
     })
   }

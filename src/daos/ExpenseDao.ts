@@ -127,16 +127,74 @@ export class ExpenseDao {
     })
   }
 
-  deleteById(id: string): Promise<Optional<Expense>> {
+  getById(expenseId: string, actorId: string): Promise<Optional<Expense>> {
+    return Neo4JUtil.session(this.neo4jDriver, 'read', async (session) => {
+      const { records } = await session.run(
+        `MATCH (p:Person)<-[:PAID_BY]-(e:Expense { id: $id })<-[s:SHOULD_PAY]-(d:Person)
+        RETURN p, e, s, d`,
+        { id: expenseId }
+      )
+
+      if (records.length === 0) return
+
+      const dbPayer: DBPerson = records[0].get('p').properties
+      const dbExpense: DBExpense = records[0].get('e').properties
+
+      const dbShouldPayRels: DBRelShouldPay[] = records.map(
+        (r) => r.get('s').properties
+      )
+      const dbDebtorPersons: DBPerson[] = records.map(
+        (r) => r.get('d').properties
+      )
+
+      if (
+        dbPayer.id === actorId ||
+        dbDebtorPersons.some((d) => d.id === actorId)
+      )
+        return ExpenseAdapter.toExpenseModel(
+          dbExpense,
+          dbPayer,
+          dbDebtorPersons,
+          dbShouldPayRels
+        )
+    })
+  }
+
+  deleteById(id: string, actorId: string): Promise<Optional<Expense>> {
     return Neo4JUtil.session(this.neo4jDriver, 'write', async (session) => {
       const { records } = await session.run(
-        `MATCH (e:Expense { id: $id }) RETURN e`,
+        `MATCH (p:Person)<-[:PAID_BY]-(e:Expense { id: $id })<-[s:SHOULD_PAY]-(d:Person)
+        RETURN p, e, s, d`,
         { id }
       )
 
-      await session.run(`MATCH (e:Expense { id: $id }) DETACH DELETE e`, { id })
+      if (records.length === 0) return
 
-      return records[0].get('e').properties
+      const dbPayer: DBPerson = records[0].get('p').properties
+      const dbExpense: DBExpense = records[0].get('e').properties
+
+      const dbShouldPayRels: DBRelShouldPay[] = records.map(
+        (r) => r.get('s').properties
+      )
+      const dbDebtorPersons: DBPerson[] = records.map(
+        (r) => r.get('d').properties
+      )
+
+      if (
+        dbPayer.id === actorId ||
+        dbDebtorPersons.some((d) => d.id === actorId)
+      ) {
+        await session.run(`MATCH (e:Expense { id: $id }) DETACH DELETE e`, {
+          id
+        })
+
+        return ExpenseAdapter.toExpenseModel(
+          dbExpense,
+          dbPayer,
+          dbDebtorPersons,
+          dbShouldPayRels
+        )
+      }
     })
   }
 }
