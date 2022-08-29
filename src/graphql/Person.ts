@@ -3,8 +3,7 @@ import {
   interfaceType,
   nonNull,
   objectType,
-  stringArg,
-  unionType
+  stringArg
 } from 'nexus'
 
 export const Person = interfaceType({
@@ -20,6 +19,14 @@ export const Person = interfaceType({
   }
 })
 
+export const User = objectType({
+  name: 'User',
+  definition(t) {
+    t.implements('Person')
+    t.nonNull.string('email')
+  }
+})
+
 export const OfflinePerson = objectType({
   name: 'OfflinePerson',
   definition(t) {
@@ -27,30 +34,11 @@ export const OfflinePerson = objectType({
   }
 })
 
-export const Persons = objectType({
-  name: 'Persons',
-  definition(t) {
-    t.nonNull.list.nonNull.field('persons', { type: 'Person' })
-  }
-})
-
-export const PersonsResult = unionType({
-  name: 'PersonsResult',
-  resolveType(data) {
-    const __typename = 'errorMessage' in data ? 'Error' : 'Persons'
-
-    return __typename
-  },
-  definition(t) {
-    t.members('Persons', 'Error')
-  }
-})
-
 export const PersonQuery = extendType({
   type: 'Query',
   definition(t) {
-    t.nonNull.field('findPersons', {
-      type: 'PersonsResult',
+    t.nonNull.list.nonNull.field('findPersons', {
+      type: 'Person',
       args: {
         name: nonNull(stringArg())
       },

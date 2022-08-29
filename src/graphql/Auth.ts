@@ -1,4 +1,4 @@
-import { extendType, nonNull, objectType, stringArg, unionType } from 'nexus'
+import { extendType, nonNull, objectType, stringArg } from 'nexus'
 
 export const AuthPayload = objectType({
   name: 'AuthPayload',
@@ -10,23 +10,11 @@ export const AuthPayload = objectType({
   }
 })
 
-export const AuthResult = unionType({
-  name: 'AuthResult',
-  resolveType(data) {
-    const __typename = 'token' in data ? 'AuthPayload' : 'Error'
-
-    return __typename
-  },
-  definition(t) {
-    t.members('AuthPayload', 'Error')
-  }
-})
-
 export const AuthMutation = extendType({
   type: 'Mutation',
   definition(t) {
     t.nonNull.field('login', {
-      type: 'AuthResult',
+      type: 'AuthPayload',
       args: {
         email: nonNull(stringArg()),
         password: nonNull(stringArg())
@@ -37,7 +25,7 @@ export const AuthMutation = extendType({
     })
 
     t.nonNull.field('register', {
-      type: 'AuthResult',
+      type: 'AuthPayload',
       args: {
         username: nonNull(stringArg()),
         email: nonNull(stringArg()),
@@ -45,6 +33,18 @@ export const AuthMutation = extendType({
       },
       async resolve(parent, args, context) {
         return context.services.auth.register(args)
+      }
+    })
+  }
+})
+
+export const AuthQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('currentUser', {
+      type: 'User',
+      async resolve(parent, args, context) {
+        return (await context.services.auth.getUser(context.userId)) ?? null
       }
     })
   }

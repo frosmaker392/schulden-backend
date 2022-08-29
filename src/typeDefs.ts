@@ -1,8 +1,4 @@
-import {
-  NexusGenInterfaces,
-  NexusGenObjects,
-  NexusGenUnions
-} from '../nexus-typegen'
+import { NexusGenInterfaces, NexusGenObjects } from '../nexus-typegen'
 
 // Basic types
 export interface JWTPayload {
@@ -14,20 +10,12 @@ export type GUser = NexusGenObjects['User']
 export type GOfflineUser = NexusGenObjects['OfflinePerson']
 export type GPerson = NexusGenInterfaces['Person']
 
-export type GUserResult = NexusGenUnions['UserResult']
-export type GPersonsResult = NexusGenUnions['PersonsResult']
-
 export type GExpense = NexusGenObjects['Expense']
-export type GExpenseResult = NexusGenUnions['ExpenseResult']
-export type GExpensesResult = NexusGenUnions['ExpensesResult']
 
 export type GDebtor = NexusGenObjects['Debtor']
-export type GDebtorsResult = NexusGenUnions['DebtorsResult']
-export type GDebtSummaryResult = NexusGenUnions['DebtSummaryResult']
+export type GDebtSummary = NexusGenObjects['DebtSummary']
 
-export type GAuthResult = NexusGenUnions['AuthResult']
 export type GAuthPayload = NexusGenObjects['AuthPayload']
-export type GError = NexusGenObjects['Error']
 
 // DB types
 export interface Neo4JEntity<T> {

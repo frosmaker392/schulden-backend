@@ -1,9 +1,10 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import Validator from '../utils/Validator'
-import { JWTPayload, GAuthResult, GUser } from '../typeDefs'
+import { JWTPayload, GUser, GAuthPayload } from '../typeDefs'
 import PersonAdapter from '../adapters/PersonAdapter'
 import { UserDao } from '../daos/UserDao'
+import { ForbiddenError, UserInputError } from 'apollo-server'
 import { Optional } from '../utils/utilityTypes'
 
 interface RegisterForm {
@@ -29,25 +30,23 @@ export default class AuthService {
 
   constructor(private userDao: UserDao, private jwtSecret: string) {}
 
-  async register(registerForm: RegisterForm): Promise<GAuthResult> {
+  async register(registerForm: RegisterForm): Promise<GAuthPayload> {
     const { email, username, password } = registerForm
 
     for (const k of Object.keys(registerForm)) {
       const field = k as keyof RegisterForm
 
       if (!this.validator.validate(field, registerForm[field]))
-        return {
-          errorMessage: this.validatorErrors[field]
-        }
+        throw new UserInputError(this.validatorErrors[field])
     }
 
     const existingUserWithEmail = await this.userDao.getUniqueByEmail(email)
     const existingUserWithName = await this.userDao.getUniqueByName(username)
 
     if (existingUserWithEmail || existingUserWithName)
-      return {
-        errorMessage: 'User already exists with this email or username!'
-      }
+      throw new UserInputError(
+        'User already exists with this email or username!'
+      )
 
     const passwordHash = await bcrypt.hash(password, 10)
 
@@ -68,15 +67,15 @@ export default class AuthService {
     }
   }
 
-  async login(loginForm: LoginForm): Promise<GAuthResult> {
+  async login(loginForm: LoginForm): Promise<GAuthPayload> {
     const loginErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
     const user = await this.userDao.getUniqueByEmail(email)
-    if (!user) return { errorMessage: loginErrorMsg }
+    if (!user) throw new UserInputError(loginErrorMsg)
 
     const valid = await bcrypt.compare(password, user.passwordHash)
-    if (!valid) return { errorMessage: loginErrorMsg }
+    if (!valid) throw new UserInputError(loginErrorMsg)
 
     const authTokenPayload: JWTPayload = {
       userId: user.id
@@ -89,8 +88,11 @@ export default class AuthService {
     }
   }
 
-  async getUser(id: string): Promise<Optional<GUser>> {
+  async getUser(id?: string): Promise<Optional<GUser>> {
+    if (!id) throw new ForbiddenError('Unauthorized!')
+
     const user = await this.userDao.getUniqueById(id)
-    return user ? PersonAdapter.toGUser(user) : undefined
+    if (!user) return
+    return PersonAdapter.toGUser(user)
   }
 }

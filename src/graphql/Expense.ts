@@ -5,8 +5,7 @@ import {
   list,
   nonNull,
   objectType,
-  stringArg,
-  unionType
+  stringArg
 } from 'nexus'
 import { ExpenseForm } from '../daos/ExpenseDao'
 
@@ -29,30 +28,6 @@ export const Expenses = objectType({
   }
 })
 
-export const ExpenseResult = unionType({
-  name: 'ExpenseResult',
-  resolveType(data) {
-    const __typename = 'errorMessage' in data ? 'Error' : 'Expense'
-
-    return __typename
-  },
-  definition(t) {
-    t.members('Expense', 'Error')
-  }
-})
-
-export const ExpensesResult = unionType({
-  name: 'ExpensesResult',
-  resolveType(data) {
-    const __typename = 'errorMessage' in data ? 'Error' : 'Expenses'
-
-    return __typename
-  },
-  definition(t) {
-    t.members('Expenses', 'Error')
-  }
-})
-
 export const DebtorInputType = inputObjectType({
   name: 'DebtorInputType',
   definition(t) {
@@ -63,15 +38,15 @@ export const DebtorInputType = inputObjectType({
 export const ExpenseQuery = extendType({
   type: 'Query',
   definition(t) {
-    t.nonNull.field('getAllExpenses', {
-      type: 'ExpensesResult',
+    t.nonNull.list.nonNull.field('getAllExpenses', {
+      type: 'Expense',
       async resolve(parent, args, context) {
         return context.services.expense.getAllExpenses(context.userId)
       }
     })
 
-    t.nonNull.field('getAllRelatedExpenses', {
-      type: 'ExpensesResult',
+    t.nonNull.list.nonNull.field('getAllRelatedExpenses', {
+      type: 'Expense',
       args: {
         personId: nonNull(stringArg())
       },
@@ -84,7 +59,7 @@ export const ExpenseQuery = extendType({
     })
 
     t.nonNull.field('getExpense', {
-      type: 'ExpenseResult',
+      type: 'Expense',
       args: {
         expenseId: nonNull(stringArg())
       },
@@ -102,7 +77,7 @@ export const ExpenseMutation = extendType({
   type: 'Mutation',
   definition(t) {
     t.nonNull.field('createExpense', {
-      type: 'ExpenseResult',
+      type: 'Expense',
       args: {
         name: nonNull(stringArg()),
         totalAmount: nonNull(floatArg()),
@@ -119,7 +94,7 @@ export const ExpenseMutation = extendType({
     })
 
     t.nonNull.field('deleteExpense', {
-      type: 'ExpenseResult',
+      type: 'Expense',
       args: {
         expenseId: nonNull(stringArg())
       },
