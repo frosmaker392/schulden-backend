@@ -52,9 +52,6 @@ export interface NexusGenObjects {
     timestamp: string; // String!
     totalAmount: number; // Float!
   }
-  Expenses: { // root type
-    expenses: NexusGenRootTypes['Expense'][]; // [Expense!]!
-  }
   Mutation: {};
   OfflinePerson: { // root type
     id: string; // ID!
@@ -100,11 +97,9 @@ export interface NexusGenFieldTypes {
     timestamp: string; // String!
     totalAmount: number; // Float!
   }
-  Expenses: { // field return type
-    expenses: NexusGenRootTypes['Expense'][]; // [Expense!]!
-  }
   Mutation: { // field return type
     createExpense: NexusGenRootTypes['Expense']; // Expense!
+    createOfflinePerson: NexusGenRootTypes['OfflinePerson']; // OfflinePerson!
     deleteExpense: NexusGenRootTypes['Expense']; // Expense!
     login: NexusGenRootTypes['AuthPayload']; // AuthPayload!
     register: NexusGenRootTypes['AuthPayload']; // AuthPayload!
@@ -121,6 +116,7 @@ export interface NexusGenFieldTypes {
     getAllRelatedExpenses: NexusGenRootTypes['Expense'][]; // [Expense!]!
     getDebtSummary: NexusGenRootTypes['DebtSummary']; // DebtSummary!
     getExpense: NexusGenRootTypes['Expense']; // Expense!
+    getPerson: NexusGenRootTypes['Person']; // Person!
   }
   User: { // field return type
     email: string; // String!
@@ -154,11 +150,9 @@ export interface NexusGenFieldTypeNames {
     timestamp: 'String'
     totalAmount: 'Float'
   }
-  Expenses: { // field return type name
-    expenses: 'Expense'
-  }
   Mutation: { // field return type name
     createExpense: 'Expense'
+    createOfflinePerson: 'OfflinePerson'
     deleteExpense: 'Expense'
     login: 'AuthPayload'
     register: 'AuthPayload'
@@ -175,6 +169,7 @@ export interface NexusGenFieldTypeNames {
     getAllRelatedExpenses: 'Expense'
     getDebtSummary: 'DebtSummary'
     getExpense: 'Expense'
+    getPerson: 'Person'
   }
   User: { // field return type name
     email: 'String'
@@ -194,6 +189,9 @@ export interface NexusGenArgTypes {
       name: string; // String!
       payerId: string; // String!
       totalAmount: number; // Float!
+    }
+    createOfflinePerson: { // args
+      name: string; // String!
     }
     deleteExpense: { // args
       expenseId: string; // String!
@@ -217,6 +215,9 @@ export interface NexusGenArgTypes {
     }
     getExpense: { // args
       expenseId: string; // String!
+    }
+    getPerson: { // args
+      id: string; // String!
     }
   }
 }

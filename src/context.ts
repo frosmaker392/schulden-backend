@@ -13,12 +13,14 @@ import { OfflinePersonDao } from './daos/OfflinePersonDao'
 import { ExpenseDao } from './daos/ExpenseDao'
 import DebtService from './services/DebtService'
 import { DebtDao } from './daos/DebtDao'
+import PersonService from './services/PersonService'
 
 export interface Context {
   services: {
     auth: AuthService
     expense: ExpenseService
     debt: DebtService
+    person: PersonService
   }
   envObject: EnvObject<typeof envKeys>
   userId?: string
@@ -40,7 +42,8 @@ export const createContext = (
   const services = {
     auth: new AuthService(userDao, envObject.APP_SECRET),
     expense: new ExpenseService(expenseDao, userDao, offlinePersonDao),
-    debt: new DebtService(debtDao)
+    debt: new DebtService(debtDao),
+    person: new PersonService(userDao, offlinePersonDao)
   }
 
   return ({ req }: { req: Request }) => {

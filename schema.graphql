@@ -31,12 +31,9 @@ type Expense {
   totalAmount: Float!
 }
 
-type Expenses {
-  expenses: [Expense!]!
-}
-
 type Mutation {
   createExpense(debtors: [DebtorInputType!]!, name: String!, payerId: String!, totalAmount: Float!): Expense!
+  createOfflinePerson(name: String!): OfflinePerson!
   deleteExpense(expenseId: String!): Expense!
   login(email: String!, password: String!): AuthPayload!
   register(email: String!, password: String!, username: String!): AuthPayload!
@@ -60,6 +57,7 @@ type Query {
   getAllRelatedExpenses(personId: String!): [Expense!]!
   getDebtSummary: DebtSummary!
   getExpense(expenseId: String!): Expense!
+  getPerson(id: String!): Person!
 }
 
 type User implements Person {

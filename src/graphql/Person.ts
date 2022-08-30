@@ -37,13 +37,38 @@ export const OfflinePerson = objectType({
 export const PersonQuery = extendType({
   type: 'Query',
   definition(t) {
+    t.nonNull.field('getPerson', {
+      type: 'Person',
+      args: {
+        id: nonNull(stringArg())
+      },
+      async resolve(parent, { id }, context) {
+        return context.services.person.getPerson(id, context.userId)
+      }
+    })
+
     t.nonNull.list.nonNull.field('findPersons', {
       type: 'Person',
       args: {
         name: nonNull(stringArg())
       },
       async resolve(parent, { name }, context) {
-        return context.services.expense.findPersons(name, context.userId)
+        return context.services.person.findPersons(name, context.userId)
+      }
+    })
+  }
+})
+
+export const PersonMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.nonNull.field('createOfflinePerson', {
+      type: 'OfflinePerson',
+      args: {
+        name: nonNull(stringArg())
+      },
+      async resolve(parent, { name }, context) {
+        return context.services.person.createOfflinePerson(name, context.userId)
       }
     })
   }

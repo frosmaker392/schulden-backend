@@ -21,13 +21,6 @@ export const Expense = objectType({
   }
 })
 
-export const Expenses = objectType({
-  name: 'Expenses',
-  definition(t) {
-    t.nonNull.list.nonNull.field('expenses', { type: 'Expense' })
-  }
-})
-
 export const DebtorInputType = inputObjectType({
   name: 'DebtorInputType',
   definition(t) {
