@@ -40,8 +40,8 @@ export default class AuthService {
         throw new UserInputError(this.validatorErrors[field])
     }
 
-    const existingUserWithEmail = await this.userDao.getUniqueByEmail(email)
-    const existingUserWithName = await this.userDao.getUniqueByName(username)
+    const existingUserWithEmail = await this.userDao.getByEmail(email)
+    const existingUserWithName = await this.userDao.getByName(username)
 
     if (existingUserWithEmail || existingUserWithName)
       throw new UserInputError(
@@ -71,7 +71,7 @@ export default class AuthService {
     const loginErrorMsg = 'Invalid email and password combination!'
     const { email, password } = loginForm
 
-    const user = await this.userDao.getUniqueByEmail(email)
+    const user = await this.userDao.getByEmail(email)
     if (!user) throw new UserInputError(loginErrorMsg)
 
     const valid = await bcrypt.compare(password, user.passwordHash)
@@ -91,7 +91,7 @@ export default class AuthService {
   async getUser(id?: string): Promise<Optional<GUser>> {
     if (!id) throw new ForbiddenError('Unauthorized!')
 
-    const user = await this.userDao.getUniqueById(id)
+    const user = await this.userDao.getById(id)
     if (!user) return
     return PersonAdapter.toGUser(user)
   }

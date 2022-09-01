@@ -32,7 +32,7 @@ export class UserDao {
     })
   }
 
-  getUniqueById(id: string): Promise<Optional<User>> {
+  getById(id: string): Promise<Optional<User>> {
     return Neo4JUtil.session(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
         `MATCH (u:User { id: $id }) RETURN DISTINCT u`,
@@ -45,7 +45,7 @@ export class UserDao {
     })
   }
 
-  getUniqueByName(name: string): Promise<Optional<User>> {
+  getByName(name: string): Promise<Optional<User>> {
     return Neo4JUtil.session(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
         `MATCH (u:User { name: $name }) RETURN DISTINCT u`,
@@ -58,7 +58,7 @@ export class UserDao {
     })
   }
 
-  getUniqueByEmail(email: string): Promise<Optional<User>> {
+  getByEmail(email: string): Promise<Optional<User>> {
     return Neo4JUtil.session(this.neo4jDriver, 'read', async (session) => {
       const { records } = await session.run(
         `MATCH (u:User { email: $email }) RETURN DISTINCT u`,

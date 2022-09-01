@@ -22,7 +22,7 @@ export default class PersonService {
   async getPerson(personId: string, actorId?: string): Promise<GPerson> {
     if (!actorId) throw new ForbiddenError('Unauthorized!')
 
-    const user = await this.userDao.getUniqueById(personId)
+    const user = await this.userDao.getById(personId)
     if (user) return user
 
     const offlinePerson = (await this.offlinePersonDao.getAll(actorId)).find(

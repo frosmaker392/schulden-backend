@@ -28,7 +28,7 @@ export default class ExpenseService {
     for (const id of allIds) {
       if (
         !offlinePersons.some((o) => o.id === id) &&
-        !(await this.userDao.getUniqueById(id))
+        !(await this.userDao.getById(id))
       )
         throw new UserInputError('Ids are invalid!')
     }
