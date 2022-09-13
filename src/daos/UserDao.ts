@@ -27,7 +27,7 @@ export class UserDao {
         }
       )
 
-      const dbUser = records[0].get('u').properties
+      const dbUser: DBUser = records[0].get('u').properties
       return PersonAdapter.toUserModel(dbUser)
     })
   }
@@ -52,9 +52,8 @@ export class UserDao {
         { name }
       )
 
-      const dbUser = records.at(0)?.get('u').properties
-      if (!dbUser) return
-      return PersonAdapter.toUserModel(dbUser)
+      const dbUser: Optional<DBUser> = records.at(0)?.get('u').properties
+      if (dbUser) return PersonAdapter.toUserModel(dbUser)
     })
   }
 
@@ -65,9 +64,8 @@ export class UserDao {
         { email }
       )
 
-      const dbUser = records.at(0)?.get('u').properties
-      if (!dbUser) return
-      return PersonAdapter.toUserModel(dbUser)
+      const dbUser: Optional<DBUser> = records.at(0)?.get('u').properties
+      if (dbUser) return PersonAdapter.toUserModel(dbUser)
     })
   }
 
