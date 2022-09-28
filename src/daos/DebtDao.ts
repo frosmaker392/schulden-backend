@@ -48,7 +48,10 @@ export class DebtDao {
         return newAcc
       }, [] as Debtor[])
 
-      return reduced.sort((a, b) => a.amount - b.amount)
+      return reduced.sort((a, b) => {
+        if (a.amount !== b.amount) return b.amount - a.amount
+        else return a.person.name.localeCompare(b.person.name)
+      })
     })
   }
 }
